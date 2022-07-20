@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/health-tracker/static/css/main.aa207b53.css",
+    "main.js": "/health-tracker/static/js/main.5e89337f.js",
+    "static/js/377.2dd6a83c.chunk.js": "/health-tracker/static/js/377.2dd6a83c.chunk.js",
+    "static/media/blueprint-icons-20.eot?": "/health-tracker/static/media/blueprint-icons-20.7c675118c62235e8ba85.eot",
+    "static/media/blueprint-icons-20.ttf?": "/health-tracker/static/media/blueprint-icons-20.58cecdd9d530e9748708.ttf",
+    "static/media/blueprint-icons-16.eot?": "/health-tracker/static/media/blueprint-icons-16.eeaaf48f3aa9749d8399.eot",
+    "static/media/blueprint-icons-16.ttf?": "/health-tracker/static/media/blueprint-icons-16.8dad11908ed3e5e9e47a.ttf",
+    "static/media/blueprint-icons-20.woff?": "/health-tracker/static/media/blueprint-icons-20.37c48d148164e6a1b9b1.woff",
+    "static/media/blueprint-icons-16.woff?": "/health-tracker/static/media/blueprint-icons-16.bdd01e08b240fc397e5a.woff",
+    "service-worker.js": "/health-tracker/service-worker.js",
+    "static/media/blueprint-icons-20.woff2?": "/health-tracker/static/media/blueprint-icons-20.16fbb3eddfb5d29019ae.woff2",
+    "static/media/blueprint-icons-16.woff2?": "/health-tracker/static/media/blueprint-icons-16.d59af1d43e67354fabe4.woff2",
+    "index.html": "/health-tracker/index.html",
+    "main.aa207b53.css.map": "/health-tracker/static/css/main.aa207b53.css.map",
+    "main.5e89337f.js.map": "/health-tracker/static/js/main.5e89337f.js.map",
+    "377.2dd6a83c.chunk.js.map": "/health-tracker/static/js/377.2dd6a83c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.aa207b53.css",
+    "static/js/main.5e89337f.js"
+  ]
+}
