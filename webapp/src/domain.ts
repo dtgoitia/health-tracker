@@ -36,7 +36,7 @@ export function getSymptomsFromStorage(): Symptom[] {
     return [];
   }
 
-  console.debug(symptoms);
+  console.debug(JSON.stringify(symptoms));
 
   return symptoms as Symptom[];
 }
@@ -66,7 +66,7 @@ export function getHistoryFromStorage(): Metric[] {
     return metric;
   });
 
-  console.debug(history);
+  console.debug(JSON.stringify(history));
 
   return history;
 }
