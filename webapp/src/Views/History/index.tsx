@@ -82,7 +82,9 @@ function HistoryView({
             {dayActivities.map((metric, j) => {
               const symptom = symptomIndex.get(metric.symptomId) as Symptom;
               if (!symptom) {
-                return <div key={j}>Metric {metric.symptomId} not found</div>;
+                const errorMessage = `Metric ${metric.symptomId} not found`;
+                console.warn(errorMessage);
+                return <div key={j}>{errorMessage}</div>;
               }
 
               if (isEditModeOn) {
