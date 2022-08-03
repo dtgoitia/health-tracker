@@ -19,12 +19,12 @@ function buildCsv(activities: Symptom[], history: Metric[]): Blob {
     const symptom = symptomIndex.get(symptomId) as Symptom;
     if (symptom === undefined) {
       // TODO: push these errors to a central service
-      throw new Error(`Could not find any symptom with ID=${symptomId}`);
+      // throw new Error(`Could not find any symptom with ID=${symptomId}`);
     }
 
     const columns: (string | number)[] = [
       formatDate(metric.date),
-      symptom.name,
+      symptom ? symptom.name : `symptomId=${symptomId} not found`,
       metric.intensity,
     ];
     const row = columns.join(",");
