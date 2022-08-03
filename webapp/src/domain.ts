@@ -36,6 +36,8 @@ export function getSymptomsFromStorage(): Symptom[] {
     return [];
   }
 
+  console.debug(symptoms);
+
   return symptoms as Symptom[];
 }
 
@@ -53,9 +55,7 @@ export function getHistoryFromStorage(): Metric[] {
     return [];
   }
 
-  const history: Metric[] = (
-    rawHistory as StoredMetric[]
-  ).map((raw) => {
+  const history: Metric[] = (rawHistory as StoredMetric[]).map((raw) => {
     const metric: Metric = {
       id: raw.id,
       symptomId: raw.symptomId,
@@ -65,6 +65,8 @@ export function getHistoryFromStorage(): Metric[] {
     };
     return metric;
   });
+
+  console.debug(history);
 
   return history;
 }
@@ -89,10 +91,7 @@ export function addSymptom(
   }));
 }
 
-export function removeSymptom(
-  symptoms: Symptom[],
-  id: SymptomId
-): Symptom[] {
+export function removeSymptom(symptoms: Symptom[], id: SymptomId): Symptom[] {
   return (
     symptoms
       .filter((symptom) => symptom.id !== id)
@@ -260,9 +259,7 @@ export function isSymptomUsedInHistory(
   return false;
 }
 
-export function indexSymptoms(
-  symptoms: Symptom[]
-): Map<SymptomId, Symptom> {
+export function indexSymptoms(symptoms: Symptom[]): Map<SymptomId, Symptom> {
   const map = new Map<SymptomId, Symptom>();
   symptoms.forEach((symptom) => {
     map.set(symptom.id, symptom);
@@ -270,21 +267,15 @@ export function indexSymptoms(
   return map;
 }
 
-export function updateHistory(
-  history: Metric[],
-  updated: Metric
-): Metric[] {
+export function updateHistory(history: Metric[], updated: Metric): Metric[] {
   const newHistory = history.map((existing) => {
     return existing.id === updated.id ? updated : existing;
   });
   return newHistory;
 }
 
-export function deleteMetric(
-  history: Metric[],
-  id: MetricId
-): Metric[] {
-  const newHistory = history.filter( (metric) => metric.id !== id);
+export function deleteMetric(history: Metric[], id: MetricId): Metric[] {
+  const newHistory = history.filter((metric) => metric.id !== id);
   return newHistory;
 }
 

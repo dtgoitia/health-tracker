@@ -80,9 +80,11 @@ function HistoryView({
           <div key={i}>
             <DayHeader>{day}</DayHeader>
             {dayActivities.map((metric, j) => {
-              const symptom = symptomIndex.get(
-                metric.symptomId
-              ) as Symptom;
+              const symptom = symptomIndex.get(metric.symptomId) as Symptom;
+              if (!symptom) {
+                return <div key={j}>Metric {metric.symptomId} not found</div>;
+              }
+
               if (isEditModeOn) {
                 return (
                   <EditableRow
@@ -94,13 +96,7 @@ function HistoryView({
                   />
                 );
               }
-              return (
-                <Row
-                  key={j}
-                  symptom={symptom}
-                  metric={metric}
-                />
-              );
+              return <Row key={j} symptom={symptom} metric={metric} />;
             })}
           </div>
         );
