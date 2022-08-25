@@ -197,6 +197,24 @@ export class ItemAutocompleter {
   }
 }
 
+enum SortAction {
+  FIRST_A_THEN_B = -1,
+  PRESERVE_ORDER = 0,
+  FIRST_B_THEN_A = 1,
+}
+
+export function sortHistory(history: Metric[]): Metric[] {
+  // Sort from newest to oldest
+  return history.sort(function (a: Metric, b: Metric) {
+    const date_a = a.date.getTime();
+    const date_b = b.date.getTime();
+    if (date_a === date_b) return SortAction.PRESERVE_ORDER;
+    if (date_a > date_b) return SortAction.FIRST_A_THEN_B;
+    if (date_a < date_b) return SortAction.FIRST_B_THEN_A;
+    throw new Error("Unexpected scenario reached :S");
+  });
+}
+
 export function addMetric(
   history: Metric[],
   symptomId: SymptomId,

@@ -1,5 +1,5 @@
-import AddSymptom from "./AddSymptom";
 import AddMetric from "./AddMetric";
+import AddSymptom from "./AddSymptom";
 import "./App.css";
 import DownloadCsv from "./DownloadCsv";
 import ReloadPage from "./ReloadPage";
@@ -20,6 +20,7 @@ import {
   isSymptomUsedInHistory,
   Notes,
   Metric,
+  sortHistory,
 } from "./domain";
 import storage from "./localStorage";
 import BlueprintThemeProvider from "./style/theme";
@@ -35,14 +36,14 @@ const Centered = styled.div`
 function App() {
   const [symptoms, setSymptoms] = useState(getSymptomsFromStorage());
   const [selected, setSelected] = useState<SymptomId | undefined>(undefined);
-  const [history, setHistory] = useState(getHistoryFromStorage());
+  const [history, _setHistory] = useState(getHistoryFromStorage());
+  function setHistory(history: Metric[]): void {
+    _setHistory(sortHistory(history));
+  }
   const [filterQuery, setFilterQuery] = useState<FilterQuery>("");
   storage.symptoms.set(symptoms);
 
-  const handleAddSymptom = (
-    name: SymptomName,
-    otherNames: SymptomName[]
-  ) => {
+  const handleAddSymptom = (name: SymptomName, otherNames: SymptomName[]) => {
     console.log(`Adding a new symptom: ${name}`);
     setSymptoms(addSymptom(symptoms, name, otherNames));
   };
@@ -62,12 +63,7 @@ function App() {
     notes: Notes
   ) => {
     console.log(`Adding a new metric: id=${id}`);
-    const updatedHistory = addMetric(
-      history,
-      id,
-      intensity,
-      notes
-    );
+    const updatedHistory = addMetric(history, id, intensity, notes);
     setHistory(updatedHistory);
     storage.history.set(updatedHistory);
     setSelected(undefined);
