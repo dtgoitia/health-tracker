@@ -108,23 +108,23 @@ function HistoryView({
           onClick={handleDuplicate}
         />
       ) : null}
-      {metricsByDay.map(([day, dayActivities], i) => {
+      {metricsByDay.map(([day, dayActivities]) => {
         return (
-          <div key={i}>
+          <div key={day}>
             <DayHeader>{day}</DayHeader>
-            {dayActivities.map((metric, j) => {
+            {dayActivities.map((metric) => {
               const symptom = symptomIndex.get(metric.symptomId) as Symptom;
               const id = metric.id;
               if (!symptom) {
                 const errorMessage = `Metric ${metric.symptomId} not found`;
                 console.warn(errorMessage);
-                return <div key={j}>{errorMessage}</div>;
+                return <div key={id}>{errorMessage}</div>;
               }
 
               if (isEditModeOn) {
                 return (
                   <EditableRow
-                    key={j}
+                    key={id}
                     symptom={symptom}
                     metric={metric}
                     selected={selection.has(id)}
@@ -134,7 +134,7 @@ function HistoryView({
                   />
                 );
               }
-              return <Row key={j} symptom={symptom} metric={metric} />;
+              return <Row key={id} symptom={symptom} metric={metric} />;
             })}
           </div>
         );
