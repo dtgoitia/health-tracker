@@ -1,6 +1,6 @@
 import { Symptom, Metric } from "../../domain";
 import { formatTime } from "./datetime";
-import { Button, Dialog } from "@blueprintjs/core";
+import { Button, Dialog, EditableText } from "@blueprintjs/core";
 import { TimePrecision, DatePicker } from "@blueprintjs/datetime";
 import { useState } from "react";
 import styled from "styled-components";
@@ -58,12 +58,7 @@ interface RowProps {
   onDelete: () => void;
   onChange: (updated: Metric) => void;
 }
-function EditableRow({
-  symptom,
-  metric,
-  onDelete,
-  onChange,
-}: RowProps) {
+function EditableRow({ symptom, metric, onDelete, onChange }: RowProps) {
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 
   const time: string = formatTime(metric.date);
@@ -72,6 +67,14 @@ function EditableRow({
     const updated: Metric = { ...metric, date: newDate };
     onChange(updated);
   }
+  function onNotesChange(newNotes: string) {
+    const updated: Metric = {
+      ...metric,
+      notes: newNotes,
+    };
+    onChange(updated);
+  }
+
   return (
     <Container>
       <Dialog
@@ -116,7 +119,14 @@ function EditableRow({
       </TopLine>
 
       <BottomLine>
-        <Notes>{metric.notes}</Notes>
+        <Notes>
+          <EditableText
+            multiline={false}
+            placeholder={`observations...`}
+            value={metric.notes}
+            onChange={onNotesChange}
+          />
+        </Notes>
       </BottomLine>
     </Container>
   );
