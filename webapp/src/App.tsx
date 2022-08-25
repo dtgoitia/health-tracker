@@ -37,6 +37,7 @@ function App() {
   const [symptoms, setSymptoms] = useState(getSymptomsFromStorage());
   const [selected, setSelected] = useState<SymptomId | undefined>(undefined);
   const [history, _setHistory] = useState(getHistoryFromStorage());
+  const [userIsSearching, setUserIsSearching] = useState(false);
   function setHistory(history: Metric[]): void {
     _setHistory(sortHistory(history));
   }
@@ -80,6 +81,7 @@ function App() {
 
   const clearSearch = () => {
     setFilterQuery("");
+    setUserIsSearching(false);
   };
 
   return (
@@ -89,11 +91,13 @@ function App() {
           query={filterQuery}
           onChange={setFilterQuery}
           clearSearch={clearSearch}
+          onFocus={() => setUserIsSearching(true)}
         />
         <InventoryView
           symptoms={filterSymptoms(symptoms, filterQuery)}
           removeSymptom={handleRemoveSymptom}
           selectSymptom={handleSelectSymptom}
+          collapse={!userIsSearching}
         />
         <AddMetric
           symptoms={symptoms}

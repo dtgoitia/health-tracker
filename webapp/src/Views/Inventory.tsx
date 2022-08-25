@@ -1,5 +1,5 @@
 import { Symptom, SymptomId } from "../domain";
-import { Button } from "@blueprintjs/core";
+import { Button, Collapse } from "@blueprintjs/core";
 import styled from "styled-components";
 
 const GrayedOut = styled.span`
@@ -35,26 +35,31 @@ interface InventoryViewProps {
   symptoms: Symptom[];
   selectSymptom: (id: SymptomId) => void;
   removeSymptom: (id: SymptomId) => void;
+  collapse: boolean;
 }
 function InventoryView({
   symptoms,
   selectSymptom,
   removeSymptom,
+  collapse,
 }: InventoryViewProps) {
+  const isOpen = !collapse;
   return (
     <div>
-      <ol>
-        {symptoms.map((symptom) => {
-          return (
-            <SelectableItem
-              key={`item-${symptom.id}`}
-              item={symptom}
-              onClick={selectSymptom}
-              onDelete={removeSymptom}
-            />
-          );
-        })}
-      </ol>
+      <Collapse isOpen={isOpen}>
+        <ol>
+          {symptoms.map((symptom) => {
+            return (
+              <SelectableItem
+                key={`item-${symptom.id}`}
+                item={symptom}
+                onClick={selectSymptom}
+                onDelete={removeSymptom}
+              />
+            );
+          })}
+        </ol>
+      </Collapse>
     </div>
   );
 }
