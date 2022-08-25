@@ -1,10 +1,11 @@
 import { buildTrie, findWords, TrieNode, Word } from "./autocomplete";
 import storage from "./localStorage";
+import { customAlphabet } from "nanoid";
 
 export type ISODatetimeString = string; // "2022-07-19T07:11:00+01:00"
 export type ISODateString = string; // "2022-07-19"
 export type SymptomId = number;
-export type MetricId = number;
+export type MetricId = string;
 export type SymptomName = string;
 export interface Symptom {
   id: SymptomId;
@@ -25,6 +26,14 @@ export interface Metric {
   notes: Notes;
 }
 export type FilterQuery = string;
+
+function now(): Date {
+  return new Date();
+}
+function generateRandomId(): string {
+  const generateId = customAlphabet("1234567890abcdef", 10);
+  return generateId();
+}
 
 export function getSymptomsFromStorage(): Symptom[] {
   if (!storage.symptoms.exists()) {
@@ -222,7 +231,7 @@ export function addMetric(
   notes: Notes
 ): Metric[] {
   const now = new Date();
-  const uniqueId: MetricId = Date.now();
+  const uniqueId: MetricId = generateRandomId();
   const newMetric: Metric = {
     id: uniqueId,
     symptomId,
@@ -268,8 +277,8 @@ export function isSymptomUsedInHistory(
   symptomId: SymptomId,
   history: Metric[]
 ): boolean {
-  for (const symptom of history) {
-    if (symptom.id === symptomId) {
+  for (const metric of history) {
+    if (metric.symptomId === symptomId) {
       return true;
     }
   }
@@ -324,4 +333,18 @@ export function groupByDay(history: Metric[]): DatedMetrics[] {
   }
 
   return result;
+}
+
+function duplicateOne(original: Metric): Metric {
+  return { ...original, id: generateRandomId(), date: now() };
+}
+export function duplicateSelection(
+  history: Metric[],
+  selection: Set<MetricId>
+): Metric[] {
+  const duplicates = history
+    .filter((metric) => selection.has(metric.id))
+    .map(duplicateOne);
+  const newHistory = [...history, ...duplicates];
+  return newHistory;
 }

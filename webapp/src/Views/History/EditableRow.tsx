@@ -5,9 +5,17 @@ import { TimePrecision, DatePicker } from "@blueprintjs/datetime";
 import { useState } from "react";
 import styled from "styled-components";
 
-const x = 5;
+const selectWidth = 0.9;
+const editWidth = 5;
+const SelectRow = styled.div`
+  flex-basis: ${selectWidth}rem;
+  flex-shrink: 0;
+  flex-grow: 0;
+  align-self: center;
+  justify-content: center;
+`;
 const EditTime = styled.div`
-  flex-basis: ${x}rem;
+  flex-basis: ${editWidth}rem;
   flex-shrink: 0;
   flex-grow: 0;
   align-self: center;
@@ -30,8 +38,9 @@ const DeleteMetric = styled.div`
 `;
 const Notes = styled.div`
   align-self: center;
-  padding-left: ${x}rem;
+  padding-left: ${selectWidth + editWidth}rem;
   font-size: 0.8rem;
+  max-width: 100%;
 `;
 
 const Container = styled.div`
@@ -55,10 +64,19 @@ const BottomLine = styled.div`
 interface RowProps {
   symptom: Symptom;
   metric: Metric;
+  selected: boolean;
   onDelete: () => void;
   onChange: (updated: Metric) => void;
+  onToggleSelect: () => void;
 }
-function EditableRow({ symptom, metric, onDelete, onChange }: RowProps) {
+function EditableRow({
+  symptom,
+  metric,
+  selected,
+  onDelete,
+  onChange,
+  onToggleSelect,
+}: RowProps) {
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 
   const time: string = formatTime(metric.date);
@@ -102,6 +120,9 @@ function EditableRow({ symptom, metric, onDelete, onChange }: RowProps) {
       </Dialog>
 
       <TopLine>
+        <SelectRow>
+          <input type="checkbox" checked={selected} onChange={onToggleSelect} />
+        </SelectRow>
         <EditTime>
           <Button
             icon="edit"

@@ -52,7 +52,7 @@ describe("Find items", () => {
 
 test("group completed activities by day", () => {
   const a: Metric = {
-    id: 1658253269730,
+    id: "ab001",
     symptomId: 1,
     intensity: Intensity.medium,
     date: new Date("2022-07-18T17:54:29.730Z"),
@@ -60,7 +60,7 @@ test("group completed activities by day", () => {
   };
 
   const b: Metric = {
-    id: 1658253273787,
+    id: "ab002",
     symptomId: 1,
     intensity: Intensity.medium,
     date: new Date("2022-07-19T17:54:33.787Z"),
