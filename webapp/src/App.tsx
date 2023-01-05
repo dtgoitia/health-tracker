@@ -2,6 +2,7 @@ import AddMetric from "./AddMetric";
 import AddSymptom from "./AddSymptom";
 import "./App.css";
 import DownloadCsv from "./DownloadCsv";
+import { DownloadJson } from "./DownloadJson";
 import ReloadPage from "./ReloadPage";
 import SearchBox from "./SearchBox";
 import HistoryView from "./Views/History";
@@ -110,7 +111,8 @@ function App() {
           onHistoryChange={handleHistoryChange}
         />
         <AddSymptom add={handleAddSymptom} />
-        <DownloadCsv activities={symptoms} history={history} />
+        <DownloadCsv symptoms={symptoms} history={history} />
+        <DownloadJson symptoms={symptoms} history={history} />
         <ReloadPage />
       </Centered>
     </BlueprintThemeProvider>
