@@ -44,27 +44,6 @@ export class SymptomManager {
     }
   }
 
-  public migrate(): void {
-    for (const original of this.symptoms.values()) {
-      if (needsMigration(original)) {
-        const migrated = this.migrateSymptom(original);
-        this.symptoms.set(migrated.id, migrated);
-
-        // Update metrics that depend on this symptom
-        this.changesSubject.next(new SymptomMigrated(original.id, migrated.id));
-
-        this.delete({ id: original.id });
-      }
-    }
-  }
-
-  private migrateSymptom(symptom: Symptom): Symptom {
-    const id = this.generateSymptomId();
-    const migrated = { ...symptom, id };
-    console.log(`Migrating sympotm from\n`, symptom, `\nto\n`, migrated);
-    return migrated;
-  }
-
   public add({ name, otherNames }: AddSymptomArgs): void {
     const id = this.generateSymptomId();
     const symptom: Symptom = {
@@ -150,15 +129,7 @@ export class SymptomDeleted {
   constructor(public readonly id: SymptomId) {}
 }
 
-export class SymptomMigrated {
-  constructor(public readonly oldId: SymptomId, public readonly newId: SymptomId) {}
-}
-
-export type SymptomChange =
-  | SymptomAdded
-  | SymptomUpdated
-  | SymptomDeleted
-  | SymptomMigrated;
+export type SymptomChange = SymptomAdded | SymptomUpdated | SymptomDeleted;
 
 export function setSymptomName(symptom: Symptom, name: SymptomName): Symptom {
   return { ...symptom, name, lastModified: now() };
@@ -182,8 +153,4 @@ export function getIntensityLevelShorthand(intensity: Intensity): string {
     default:
       throw unreachable(`unhandled Intensity variant: ${intensity}`);
   }
-}
-
-function needsMigration(symptom: Symptom): boolean {
-  return typeof symptom.id === "number";
 }

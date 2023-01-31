@@ -30,10 +30,5 @@ export function initialize(): App {
 
   console.log(`initialize.ts::initialize::Initialization completed`);
 
-  console.log(`initialize.ts::initialize::Running migrations...`);
-  symptomManager.migrate();
-  metricManager.migrate();
-  console.log(`initialize.ts::initialize::Migrations completed.`);
-
   return { symptomManager, metricManager };
 }

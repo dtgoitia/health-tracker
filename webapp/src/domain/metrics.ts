@@ -9,7 +9,6 @@ import {
   SymptomChange,
   SymptomDeleted,
   SymptomManager,
-  SymptomMigrated,
   SymptomUpdated,
 } from "./symptoms";
 import { Observable, Subject } from "rxjs";
@@ -58,24 +57,6 @@ export class MetricManager {
     for (const metric of metrics) {
       this.metrics.set(metric.id, metric);
     }
-  }
-
-  public migrate(): void {
-    for (const original of this.metrics.values()) {
-      if (needsMigration(original)) {
-        const migrated = this.migrateMetric(original);
-        this.metrics.delete(original.id);
-        this.metrics.set(migrated.id, migrated);
-        this.changesSubject.next(new MetricUpdated("doesn't matter"));
-      }
-    }
-  }
-
-  private migrateMetric(metric: Metric): Metric {
-    const id = this.generateMetricId();
-    const migrated = { ...metric, id };
-    console.log(`Migrating metric from\n`, metric, `\nto\n`, migrated);
-    return migrated;
   }
 
   public add({ symptomId, date, intensity, notes }: AddMetricArgs): void {
@@ -167,24 +148,8 @@ export class MetricManager {
         return;
       case change instanceof SymptomDeleted:
         return;
-      case change instanceof SymptomMigrated:
-        this.handleSymptomMigration(change as SymptomMigrated);
-        return;
       default:
         throw unreachable(`unsupported change type: ${change}`);
-    }
-  }
-
-  private handleSymptomMigration({ oldId, newId }: SymptomMigrated): void {
-    console.log(
-      `${MetricManager.name}.handleSymptomMigration::migrating metrics that point for Symptom ${oldId} to ${newId}`
-    );
-    for (const metric of this.metrics.values()) {
-      if (metric.symptomId === oldId) {
-        const migrated: Metric = { ...metric, symptomId: newId };
-        this.metrics.set(metric.id, migrated);
-        this.changesSubject.next(new MetricUpdated(metric.id));
-      }
     }
   }
 }
@@ -238,8 +203,4 @@ export function getIntensityLevelShorthand(intensity: Intensity): string {
     default:
       throw unreachable(`unhandled Intensity variant: ${intensity}`);
   }
-}
-
-function needsMigration(metric: Metric): boolean {
-  return typeof metric.id === "number";
 }

@@ -1,4 +1,3 @@
-import { now } from "../datetimeUtils";
 import { Storage } from "../localStorage";
 import { unreachable } from "./devex";
 import { MetricManager } from "./metrics";
@@ -67,17 +66,13 @@ export class BrowserStorage {
   }
 }
 
-function deserializeSymptom(raw: object): Symptom {
+function deserializeSymptom(raw: any): Symptom {
   if (raw === null || raw === undefined) {
     throw unreachable();
   }
 
-  // Remove once all items have been migrated
-  if ("lastModified" in raw === false) {
-    return { ...raw, lastModified: now() } as Symptom;
-  }
-
-  return raw as Symptom;
+  const symptom: Symptom = { ...raw, lastModified: deserializeDate(raw.lastModified) };
+  return symptom;
 }
 
 function deserializeMetric(raw: any): Metric {
@@ -88,9 +83,7 @@ function deserializeMetric(raw: any): Metric {
   const metric: Metric = {
     ...raw,
     date: deserializeDate(raw.date),
-    lastModified:
-      // Remove once all items have been migrated
-      "lastModified" in raw === false ? now() : deserializeDate(raw.lastModified),
+    lastModified: deserializeDate(raw.lastModified),
   };
 
   return metric;
