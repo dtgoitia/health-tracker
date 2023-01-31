@@ -1,4 +1,6 @@
 import ReloadPage from "../../ReloadPage";
+import CenteredPage from "../../components/CenteredPage";
+import NavBar from "../../components/NavBar";
 import { now } from "../../datetimeUtils";
 import { MetricManager } from "../../domain/metrics";
 import {
@@ -23,13 +25,6 @@ import HistoryView from "./HistoryView";
 import InventoryView from "./Inventory";
 import SearchBox from "./SearchBox";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
-
-const Centered = styled.div`
-  margin: 0 auto;
-  padding: 0 1rem;
-  max-width: 800px;
-`;
 
 interface Props {
   symptomManager: SymptomManager;
@@ -107,7 +102,8 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
 
   return (
     <BlueprintThemeProvider>
-      <Centered>
+      <CenteredPage>
+        <NavBar />
         <SearchBox
           query={filterQuery}
           onChange={setFilterQuery}
@@ -136,7 +132,7 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
         <DownloadCsv symptoms={symptoms} history={metrics} />
         <DownloadJson symptoms={symptoms} history={metrics} />
         <ReloadPage />
-      </Centered>
+      </CenteredPage>
     </BlueprintThemeProvider>
   );
 }
