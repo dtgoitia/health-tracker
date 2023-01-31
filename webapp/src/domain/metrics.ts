@@ -1,4 +1,4 @@
-import { now } from "../datetimeUtils";
+import { datetimeToMs, getDay, Milliseconds, now, yesterday } from "../datetimeUtils";
 import { unreachable } from "./devex";
 import { generateId } from "./hash";
 import { Hash, Intensity, Metric, MetricId, Notes, SymptomId } from "./model";
@@ -38,6 +38,7 @@ export class MetricManager {
 
   private changesSubject: Subject<MetricChange>;
   private metrics: Map<MetricId, Metric>;
+  private metricsByDate: Map<Milliseconds, Set<MetricId>>;
   private symptomManager: SymptomManager;
 
   constructor({ symptomManager }: ConstructorArgs) {
@@ -47,6 +48,7 @@ export class MetricManager {
     this.symptomManager = symptomManager;
 
     this.metrics = new Map<MetricId, Metric>();
+    this.metricsByDate = new Map<Milliseconds, Set<MetricId>>();
 
     this.symptomManager.changes$.subscribe((change) => {
       this.handleSymptomChange(change);
@@ -55,7 +57,11 @@ export class MetricManager {
 
   public initialize({ metrics }: InitializeArgs): void {
     for (const metric of metrics) {
-      this.metrics.set(metric.id, metric);
+      const { id } = metric;
+      this.metrics.set(id, metric);
+
+      // Potential optimization: skip any item that is older than yesterday
+      this.addMetricToDateIndex(metric);
     }
   }
 
@@ -81,10 +87,31 @@ export class MetricManager {
       );
     }
 
+    // Update metrics-by-date index
+    const previous = this.metrics.get(id);
+    if (previous) {
+      this.removeMetricFromDateIndex(previous);
+    }
+
     this.metrics.set(id, metric);
+    this.addMetricToDateIndex(metric);
 
     this.changesSubject.next(new MetricUpdated(id));
     return Ok(undefined);
+  }
+
+  private removeMetricFromDateIndex(metric: Metric): void {
+    const day = getMetricDate(metric);
+    const metricsInSameDay = this.metricsByDate.get(day) as Set<MetricId>;
+    metricsInSameDay.delete(metric.id);
+    this.metricsByDate.set(day, metricsInSameDay);
+  }
+
+  private addMetricToDateIndex(metric: Metric): void {
+    const day = getMetricDate(metric);
+    const metricsInSameDay = this.metricsByDate.get(day) || new Set<MetricId>();
+    metricsInSameDay.add(metric.id);
+    this.metricsByDate.set(day, metricsInSameDay);
   }
 
   public delete({ id }: DeleteteMetricArgs): void {
@@ -106,6 +133,20 @@ export class MetricManager {
 
   public getAll(): Metric[] {
     return [...this.metrics.values()].sort(sortMetricsByDate);
+  }
+
+  public getYesterdayMetrics(): Metric[] {
+    const _yesterday = datetimeToMs(yesterday());
+    const ids = this.metricsByDate.get(_yesterday) || new Set<MetricId>();
+
+    const metrics: Metric[] = [];
+    for (const id of ids) {
+      const metric = this.metrics.get(id);
+      if (metric === undefined) continue;
+      metrics.push(metric);
+    }
+
+    return metrics.sort(sortMetricsByDate);
   }
 
   public isSymptomUsedInHistory({ symptomId }: { symptomId: SymptomId }): boolean {
@@ -203,4 +244,11 @@ export function getIntensityLevelShorthand(intensity: Intensity): string {
     default:
       throw unreachable(`unhandled Intensity variant: ${intensity}`);
   }
+}
+
+/**
+ * The return value of this function is used to index metrics by date
+ */
+function getMetricDate(metric: Metric): Milliseconds {
+  return datetimeToMs(getDay(metric.date));
 }

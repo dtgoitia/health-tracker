@@ -17,6 +17,7 @@ import {
 import { SymptomManager } from "../../domain/symptoms";
 import storage from "../../localStorage";
 import BlueprintThemeProvider from "../../style/theme";
+import DailyReminder from "../DailyReminder";
 import AddMetric from "./AddMetric";
 import AddSymptom from "./AddSymptom";
 import DownloadCsv from "./DownloadCsv";
@@ -104,6 +105,9 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
     <BlueprintThemeProvider>
       <CenteredPage>
         <NavBar />
+
+        <DailyReminder symptomManager={symptomManager} metricManager={metricManager} />
+
         <SearchBox
           query={filterQuery}
           onChange={setFilterQuery}
@@ -121,6 +125,7 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
           selectedSymptomId={selected}
           record={handleAddMetric}
         />
+
         <HistoryView
           history={metrics}
           symptomManager={symptomManager}
