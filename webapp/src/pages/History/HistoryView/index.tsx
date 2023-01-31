@@ -1,13 +1,5 @@
-import {
-  Symptom,
-  Metric,
-  MetricId,
-  deleteMetric,
-  groupByDay,
-  indexSymptoms,
-  updateHistory,
-  duplicateSelection,
-} from "../../domain";
+import { Symptom, MetricId, groupByDay, Metric } from "../../../domain/model";
+import { SymptomManager } from "../../../domain/symptoms";
 import EditableRow from "./EditableRow";
 import Row from "./Row";
 import { Button, Switch } from "@blueprintjs/core";
@@ -28,14 +20,18 @@ const Container = styled.div`
 `;
 
 interface HistoryViewProps {
-  activities: Symptom[];
   history: Metric[];
-  onHistoryChange: (history: Metric[]) => void;
+  symptomManager: SymptomManager;
+  updateMetric: (update: Metric) => void;
+  deleteMetric: (id: MetricId) => void;
+  duplicateMetrics: (ids: Set<MetricId>) => void;
 }
 function HistoryView({
   history,
-  activities,
-  onHistoryChange,
+  symptomManager,
+  updateMetric,
+  deleteMetric,
+  duplicateMetrics,
 }: HistoryViewProps) {
   const [isEditModeOn, setIsEditModeOn] = useState<boolean>(false);
   const [selection, setSelected] = useState<Set<MetricId>>(new Set([]));
@@ -51,19 +47,7 @@ function HistoryView({
     return <Container>{`History is empty :)`}</Container>;
   }
 
-  const symptomIndex = indexSymptoms(activities);
-
   const metricsByDay = groupByDay(history);
-
-  function deleteRow(id: MetricId): void {
-    const newHistory = deleteMetric(history, id);
-    onHistoryChange(newHistory);
-  }
-
-  function updateRow(updated: Metric): void {
-    const newHistory = updateHistory(history, updated);
-    onHistoryChange(newHistory);
-  }
 
   function toggleEditMode(): void {
     setIsEditModeOn(!isEditModeOn);
@@ -74,10 +58,12 @@ function HistoryView({
   }
 
   function select(id: MetricId): Set<MetricId> {
+    // recreate the set to avoid mutations
     return new Set([...selection, id]);
   }
 
   function unselect(id: MetricId): Set<MetricId> {
+    // recreate the set to avoid mutations
     return new Set([...selection].filter((selectedId) => selectedId !== id));
   }
 
@@ -87,9 +73,8 @@ function HistoryView({
   }
 
   function handleDuplicate(): void {
-    const newHistory = duplicateSelection(history, selection);
+    duplicateMetrics(selection);
     unselectAll();
-    onHistoryChange(newHistory);
   }
 
   return (
@@ -113,11 +98,10 @@ function HistoryView({
           <div key={day}>
             <DayHeader>{day}</DayHeader>
             {dayActivities.map((metric) => {
-              const symptom = symptomIndex.get(metric.symptomId) as Symptom;
-              const id = metric.id;
-              if (!symptom) {
-                const errorMessage = `Metric ${metric.symptomId} not found`;
-                console.warn(errorMessage);
+              const { id, symptomId } = metric;
+              const symptom = symptomManager.get(symptomId) as Symptom;
+              if (symptom === undefined) {
+                const errorMessage = `Metric ${id} points a Symptom ${symptomId} that does not exist`;
                 return <div key={id}>{errorMessage}</div>;
               }
 
@@ -128,8 +112,8 @@ function HistoryView({
                     symptom={symptom}
                     metric={metric}
                     selected={selection.has(id)}
-                    onDelete={() => deleteRow(metric.id)}
-                    onChange={updateRow}
+                    onDelete={() => deleteMetric(metric.id)}
+                    onChange={updateMetric}
                     onToggleSelect={() => handleToggleSelect(id)}
                   />
                 );

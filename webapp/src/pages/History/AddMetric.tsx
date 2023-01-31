@@ -4,7 +4,7 @@ import {
   findSymptomById,
   Intensity,
   Notes,
-} from "./domain";
+} from "../../domain/model";
 import { Button } from "@blueprintjs/core";
 import { useState } from "react";
 import styled from "styled-components";
@@ -19,17 +19,9 @@ const ButtonRibbon = styled.div`
 interface AddMetricProps {
   symptoms: Symptom[];
   selectedSymptomId?: SymptomId;
-  record: (
-    id: SymptomId,
-    intensity: Intensity,
-    notes: Notes
-  ) => void;
+  record: (id: SymptomId, intensity: Intensity, notes: Notes) => void;
 }
-function AddMetric({
-  symptoms,
-  selectedSymptomId,
-  record,
-}: AddMetricProps) {
+function AddMetric({ symptoms, selectedSymptomId, record }: AddMetricProps) {
   const [intensity, setIntensity] = useState<Intensity | undefined>();
   const [notes, setNotes] = useState<string>("");
 
@@ -37,14 +29,10 @@ function AddMetric({
     event.preventDefault();
     if (!selectedSymptomId) return;
     if (!intensity) {
-      console.debug( `Intensity is required to add a metric`);
+      console.debug(`Intensity is required to add a metric`);
       return;
     }
-    record(
-      selectedSymptomId,
-      intensity as Intensity,
-      notes
-    );
+    record(selectedSymptomId, intensity as Intensity, notes);
     setIntensity(undefined);
     setNotes("");
   }
@@ -55,8 +43,7 @@ function AddMetric({
 
   const intensityButtons = Object.keys(Intensity).map((key) => {
     const buttonIntensity = key as Intensity;
-    const classNameIfSelected =
-      buttonIntensity === intensity ? "bp4-intent-success" : "";
+    const classNameIfSelected = buttonIntensity === intensity ? "bp4-intent-success" : "";
     return (
       <button
         key={key}
@@ -69,7 +56,7 @@ function AddMetric({
     );
   });
 
-  const canSubmit = selectedSymptomId !== undefined && intensity !== undefined
+  const canSubmit = selectedSymptomId !== undefined && intensity !== undefined;
 
   let selectedSymptom = undefined;
   if (selectedSymptomId) {

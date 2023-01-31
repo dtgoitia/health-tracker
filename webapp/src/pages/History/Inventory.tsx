@@ -1,4 +1,4 @@
-import { Symptom, SymptomId } from "../domain";
+import { Symptom, SymptomId } from "../../domain/model";
 import { Button, Collapse } from "@blueprintjs/core";
 import styled from "styled-components";
 
@@ -20,10 +20,7 @@ function SelectableItem({ item, onClick, onDelete }: SelectableItempProps) {
         className="bp4-button bp4-minimal"
         icon="trash"
       />
-      <Button
-        onClick={() => onClick(item.id)}
-        className="bp4-button bp4-minimal"
-      >
+      <Button onClick={() => onClick(item.id)} className="bp4-button bp4-minimal">
         <span>
           ({item.id}) {item.name} <GrayedOut>{otherNames}</GrayedOut>
         </span>

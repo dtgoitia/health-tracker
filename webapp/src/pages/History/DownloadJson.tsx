@@ -1,5 +1,5 @@
-import { now } from "./datetimeUtils";
-import { Metric, Symptom } from "./domain";
+import { now } from "../../datetimeUtils";
+import { Metric, Symptom } from "../../domain/model";
 import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -18,8 +18,7 @@ interface Props {
 }
 
 export function DownloadJson({ symptoms, history }: Props) {
-  const [shareApiIsAvailable, setShareApiIsAvailable] =
-    useState<boolean>(false);
+  const [shareApiIsAvailable, setShareApiIsAvailable] = useState<boolean>(false);
 
   useEffect(() => {
     setShareApiIsAvailable(isShareApiAvailable());
@@ -51,11 +50,7 @@ export function DownloadJson({ symptoms, history }: Props) {
 
   return (
     <Container>
-      <Button
-        intent="success"
-        text="Download JSON"
-        onClick={() => download()}
-      />
+      <Button intent="success" text="Download JSON" onClick={() => download()} />
       <Button
         intent="success"
         text="Share"
@@ -135,12 +130,7 @@ interface GenerateFileArgs {
   date: Date;
   fileName: string;
 }
-function generateFile({
-  symptoms,
-  history,
-  date,
-  fileName,
-}: GenerateFileArgs): File {
+function generateFile({ symptoms, history, date, fileName }: GenerateFileArgs): File {
   const data = { date: date.toISOString(), symptoms, history };
 
   const formattedJson = JSON.stringify(data, null, 2);
