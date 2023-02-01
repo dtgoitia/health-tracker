@@ -225,6 +225,10 @@ export class MetricDeleted {
 
 export type MetricChange = MetricAdded | MetricUpdated | MetricDeleted;
 
+export function setMetricDate(metric: Metric, date: Date): Metric {
+  return { ...metric, date, lastModified: now() };
+}
+
 export function setMetricIntensity(metric: Metric, intensity: Intensity): Metric {
   return { ...metric, intensity, lastModified: now() };
 }

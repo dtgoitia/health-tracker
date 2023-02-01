@@ -1,4 +1,10 @@
-import { Metric, Symptom } from "../../../domain/model";
+import IntensitySelector from "../../../components/IntensitySelector";
+import {
+  setMetricDate,
+  setMetricIntensity,
+  setMetricNotes,
+} from "../../../domain/metrics";
+import { Metric, Symptom, Intensity } from "../../../domain/model";
 import { formatTime } from "./datetime";
 import { Button, Dialog, EditableText } from "@blueprintjs/core";
 import { TimePrecision, DatePicker } from "@blueprintjs/datetime";
@@ -22,11 +28,6 @@ const EditTime = styled.div`
 `;
 const SymptomName = styled.div`
   flex-grow: 1;
-  flex-shrink: 0;
-  align-self: center;
-`;
-const Intensity = styled.div`
-  flex-basis: 4rem;
   flex-shrink: 0;
   align-self: center;
 `;
@@ -81,16 +82,16 @@ function EditableRow({
 
   const time: string = formatTime(metric.date);
 
-  function onDateInputChange(newDate: Date) {
-    const updated: Metric = { ...metric, date: newDate };
-    onChange(updated);
+  function handleDateChange(date: Date) {
+    onChange(setMetricDate(metric, date));
   }
-  function onNotesChange(newNotes: string) {
-    const updated: Metric = {
-      ...metric,
-      notes: newNotes,
-    };
-    onChange(updated);
+
+  function handleIntensityChange(intensity: Intensity): void {
+    onChange(setMetricIntensity(metric, intensity));
+  }
+
+  function handleNotesChange(notes: string): void {
+    onChange(setMetricNotes(metric, notes));
   }
 
   return (
@@ -113,7 +114,7 @@ function EditableRow({
             shortcuts={true}
             highlightCurrentDay={true}
             timePickerProps={{ showArrowButtons: true }}
-            onChange={onDateInputChange}
+            onChange={handleDateChange}
           />
         </div>
         <div className="bp4-dialog-footer">Changes are saved automatically</div>
@@ -133,7 +134,11 @@ function EditableRow({
         </EditTime>
         <SymptomName>{symptom.name}</SymptomName>
 
-        <Intensity>{metric.intensity}</Intensity>
+        <IntensitySelector
+          selectedIntensity={metric.intensity}
+          onSelect={handleIntensityChange}
+        />
+
         <DeleteMetric>
           <Button icon="trash" minimal={true} onClick={onDelete} />
         </DeleteMetric>
@@ -145,7 +150,7 @@ function EditableRow({
             multiline={false}
             placeholder={`observations...`}
             value={metric.notes}
-            onChange={onNotesChange}
+            onChange={handleNotesChange}
           />
         </Notes>
       </BottomLine>
