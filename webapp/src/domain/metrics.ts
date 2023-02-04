@@ -1,4 +1,11 @@
-import { datetimeToMs, getDay, Milliseconds, now, yesterday } from "../datetimeUtils";
+import {
+  datetimeToMs,
+  DayAmount,
+  getDay,
+  getLastNDates,
+  Milliseconds,
+  now,
+} from "../datetimeUtils";
 import { unreachable } from "./devex";
 import { generateId } from "./hash";
 import { Hash, Intensity, Metric, MetricId, Notes, SymptomId } from "./model";
@@ -135,9 +142,16 @@ export class MetricManager {
     return [...this.metrics.values()].sort(sortMetricsByDate);
   }
 
-  public getYesterdayMetrics(): Metric[] {
-    const _yesterday = datetimeToMs(yesterday());
-    const ids = this.metricsByDate.get(_yesterday) || new Set<MetricId>();
+  public getMetricsOfLastNDays({ n }: { n: DayAmount }): Metric[] {
+    const desiredDates = getLastNDates({ n });
+    const ids = new Set<MetricId>();
+    for (const date of desiredDates) {
+      const dateInMs = datetimeToMs(date);
+      const idsInDate = this.metricsByDate.get(dateInMs) || new Set<MetricId>();
+      for (const id of idsInDate) {
+        ids.add(id);
+      }
+    }
 
     const metrics: Metric[] = [];
     for (const id of ids) {

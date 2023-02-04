@@ -1,7 +1,7 @@
 import { now } from "../../datetimeUtils";
 import { MetricDeleted, MetricManager, MetricUpdated } from "../../domain/metrics";
 import { Intensity, Metric, Symptom, SymptomId } from "../../domain/model";
-import { SymptomManager } from "../../domain/symptoms";
+import { sortSymptomsAlphabetically, SymptomManager } from "../../domain/symptoms";
 import SymptomSuggestion from "./SymptomSuggestion";
 import { Button, Card, Collapse } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
@@ -13,25 +13,26 @@ interface Props {
 }
 function DailyReminder({ symptomManager, metricManager }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [yesterdayMetrics, setYesterdayMetrics] = useState<Metric[]>([]);
+  const [lastMetrics, setLastMetrics] = useState<Metric[]>([]);
 
   useEffect(() => {
     const subscription = metricManager.changes$.subscribe((change) => {
       if (change instanceof MetricUpdated || change instanceof MetricDeleted) {
-        setYesterdayMetrics(metricManager.getYesterdayMetrics());
+        setLastMetrics(metricManager.getMetricsOfLastNDays({ n: 2 }));
       }
     });
 
-    setYesterdayMetrics(metricManager.getYesterdayMetrics());
+    setLastMetrics(metricManager.getMetricsOfLastNDays({ n: 2 }));
 
     return () => {
       subscription.unsubscribe();
     };
   }, [metricManager]);
 
+  // TODO: sort them alphabetically - the chronological order makes no sense
   const symptomsToSuggest: Symptom[] = getSymptomsToSuggest({
     symptomManager,
-    yesterdayMetrics,
+    yesterdayMetrics: lastMetrics,
   });
 
   function handleSuggestionClick(id: SymptomId, intensity: Intensity): void {
@@ -96,5 +97,7 @@ function getSymptomsToSuggest({
     symptomsToSuggest.push(symptom);
   }
 
-  return symptomsToSuggest;
+  const sortedSymptoms = symptomsToSuggest.sort(sortSymptomsAlphabetically);
+
+  return sortedSymptoms;
 }
