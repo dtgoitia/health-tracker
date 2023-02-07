@@ -37,7 +37,7 @@ export function getLastNDates({ n }: { n: DayAmount }): Date[] {
 
   const result: Date[] = [today()];
 
-  for (let date_diff = 1; date_diff <= n; date_diff++) {
+  for (let date_diff = 1; date_diff < n; date_diff++) {
     const date = n_days_ago({ n: date_diff });
     result.push(date);
   }

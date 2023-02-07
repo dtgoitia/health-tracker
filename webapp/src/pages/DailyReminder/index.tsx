@@ -30,9 +30,9 @@ function DailyReminder({ symptomManager, metricManager }: Props) {
   }, [metricManager]);
 
   // TODO: sort them alphabetically - the chronological order makes no sense
-  const symptomsToSuggest: Symptom[] = getSymptomsToSuggest({
+  const symptomsToSuggest: Symptom[] = getSymptomsFromMetrics({
     symptomManager,
-    yesterdayMetrics: lastMetrics,
+    metrics: lastMetrics,
   });
 
   function handleSuggestionClick(id: SymptomId, intensity: Intensity): void {
@@ -77,17 +77,17 @@ const Container = styled.div``;
 /**
  * Gather symptom IDs preserving the order of yesterday metrics and remove duplicates
  */
-function getSymptomsToSuggest({
+function getSymptomsFromMetrics({
   symptomManager,
-  yesterdayMetrics,
+  metrics,
 }: {
   symptomManager: SymptomManager;
-  yesterdayMetrics: Metric[];
+  metrics: Metric[];
 }): Symptom[] {
   const visited = new Set<SymptomId>();
   const symptomsToSuggest: Symptom[] = [];
 
-  for (const metric of yesterdayMetrics) {
+  for (const metric of metrics) {
     const { symptomId } = metric;
     if (visited.has(symptomId)) continue;
     visited.add(symptomId);
