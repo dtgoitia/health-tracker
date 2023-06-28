@@ -1,6 +1,7 @@
+import AddSymptom from "../../components/AddSymptom";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
-import { Symptom } from "../../domain/model";
+import { Symptom, SymptomName } from "../../domain/model";
 import { SymptomManager } from "../../domain/symptoms";
 import Paths from "../../routes";
 import BlueprintThemeProvider from "../../style/theme";
@@ -26,6 +27,13 @@ function SymptomExplorer({ symptomManager }: Props) {
     };
   }, [symptomManager]);
 
+  function handleAddSymptom(name: SymptomName, otherNames: SymptomName[]): void {
+    console.log(
+      `${SymptomExplorer.name}.handleAddSymptom::adding a new symptom: ${name}`
+    );
+    symptomManager.add({ name, otherNames });
+  }
+
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
@@ -34,6 +42,7 @@ function SymptomExplorer({ symptomManager }: Props) {
         {symptoms.map((symptom) => (
           <OpenSymptomEditor symptom={symptom} />
         ))}
+        <AddSymptom add={handleAddSymptom} />
       </CenteredPage>
     </BlueprintThemeProvider>
   );
