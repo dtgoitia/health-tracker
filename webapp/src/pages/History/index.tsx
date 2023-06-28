@@ -1,4 +1,5 @@
 import ReloadPage from "../../ReloadPage";
+import AddSymptom from "../../components/AddSymptom";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
 import { now } from "../../datetimeUtils";
@@ -19,7 +20,6 @@ import storage from "../../localStorage";
 import BlueprintThemeProvider from "../../style/theme";
 import DailyReminder from "../DailyReminder";
 import AddMetric from "./AddMetric";
-import AddSymptom from "./AddSymptom";
 import DownloadCsv from "./DownloadCsv";
 import { DownloadJson } from "./DownloadJson";
 import HistoryView from "./HistoryView";
