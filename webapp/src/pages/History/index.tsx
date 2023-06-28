@@ -62,16 +62,6 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
     symptomManager.add({ name, otherNames });
   }
 
-  function handleRemoveSymptom(id: SymptomId): void {
-    console.log(`${HistoryPage.name}.handleRemoveSymptom::removing symptom: ${id}`);
-    if (metricManager.isSymptomUsedInHistory({ symptomId: id })) {
-      alert(`This symptom is used in the history, cannot be removed!`);
-      return;
-    }
-
-    symptomManager.delete({ id });
-  }
-
   function handleAddMetric(id: SymptomId, intensity: Intensity, notes: Notes): void {
     console.log(
       `${HistoryPage.name}.handleAddMetric::adding a new metric: symptom ID ${id}`
@@ -116,7 +106,7 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
         />
         <InventoryView
           symptoms={filterSymptoms(symptoms, filterQuery)}
-          removeSymptom={handleRemoveSymptom}
+          removeSymptom={() => alert("Please delete symptoms from Symptoms Explorer")}
           selectSymptom={handleSelectSymptom}
           collapse={!userIsSearching}
         />
