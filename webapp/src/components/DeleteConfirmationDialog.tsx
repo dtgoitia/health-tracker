@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogBody, DialogFooter, Intent } from "@blueprintjs/core";
+import { Button, Dialog, Intent } from "@blueprintjs/core";
 import { useState } from "react";
 
 interface Props {

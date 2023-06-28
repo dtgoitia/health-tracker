@@ -24,7 +24,9 @@ function App() {
       />
       <Route
         path={Paths.symptomsEditor}
-        element={<SymptomEditor symptomManager={symptomManager} />}
+        element={
+          <SymptomEditor symptomManager={symptomManager} metricManager={metricManager} />
+        }
       />
       <Route path={Paths.notFound} element={<PageNotFound />} />
     </Routes>
