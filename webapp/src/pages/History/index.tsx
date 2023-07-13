@@ -106,7 +106,6 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
         />
         <InventoryView
           symptoms={filterSymptoms(symptoms, filterQuery)}
-          removeSymptom={() => alert("Please delete symptoms from Symptoms Explorer")}
           selectSymptom={handleSelectSymptom}
           collapse={!userIsSearching}
         />

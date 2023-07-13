@@ -9,20 +9,14 @@ const GrayedOut = styled.span`
 interface SelectableItempProps {
   item: Symptom;
   onClick: (id: SymptomId) => void;
-  onDelete: (id: SymptomId) => void;
 }
-function SelectableItem({ item, onClick, onDelete }: SelectableItempProps) {
+function SelectableItem({ item, onClick }: SelectableItempProps) {
   const otherNames = item.otherNames ? item.otherNames.join(", ") : "";
   return (
     <div>
-      <Button
-        onClick={() => onDelete(item.id)}
-        className="bp4-button bp4-minimal"
-        icon="trash"
-      />
       <Button onClick={() => onClick(item.id)} className="bp4-button bp4-minimal">
         <span>
-          ({item.id}) {item.name} <GrayedOut>{otherNames}</GrayedOut>
+          {item.name} <GrayedOut>{otherNames}</GrayedOut>
         </span>
       </Button>
     </div>
@@ -31,15 +25,9 @@ function SelectableItem({ item, onClick, onDelete }: SelectableItempProps) {
 interface InventoryViewProps {
   symptoms: Symptom[];
   selectSymptom: (id: SymptomId) => void;
-  removeSymptom: (id: SymptomId) => void;
   collapse: boolean;
 }
-function InventoryView({
-  symptoms,
-  selectSymptom,
-  removeSymptom,
-  collapse,
-}: InventoryViewProps) {
+function InventoryView({ symptoms, selectSymptom, collapse }: InventoryViewProps) {
   const isOpen = !collapse;
   return (
     <div>
@@ -51,7 +39,6 @@ function InventoryView({
                 key={`item-${symptom.id}`}
                 item={symptom}
                 onClick={selectSymptom}
-                onDelete={removeSymptom}
               />
             );
           })}
