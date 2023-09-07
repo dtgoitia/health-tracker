@@ -1,4 +1,5 @@
-import { Symptom, Metric, indexSymptoms } from "../../domain/model";
+import { Symptom, Metric } from "../../lib/domain/model";
+import { indexSymptoms } from "../../lib/domain/symptoms";
 import { Button } from "@blueprintjs/core";
 import styled from "styled-components";
 

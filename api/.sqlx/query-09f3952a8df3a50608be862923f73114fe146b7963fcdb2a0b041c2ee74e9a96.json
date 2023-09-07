@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE symptoms SET published_at=$1, name=$2, other_names=$3, updated_at=$4 WHERE id=$5",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "09f3952a8df3a50608be862923f73114fe146b7963fcdb2a0b041c2ee74e9a96"
+}

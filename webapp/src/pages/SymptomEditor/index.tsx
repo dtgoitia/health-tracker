@@ -2,14 +2,13 @@ import CenteredPage from "../../components/CenteredPage";
 import { DeleteConfirmationDialog } from "../../components/DeleteConfirmationDialog";
 import NavBar from "../../components/NavBar";
 import { now } from "../../datetimeUtils";
-import { MetricManager } from "../../domain/metrics";
-import { Symptom, SymptomId, SymptomName } from "../../domain/model";
+import { HealthTracker } from "../../lib/app/app";
+import { Symptom, SymptomId, SymptomName } from "../../lib/domain/model";
 import {
   setSymptomName,
   setSymptomOtherNames,
-  SymptomManager,
   SYMPTOM_PREFIX,
-} from "../../domain/symptoms";
+} from "../../lib/domain/symptoms";
 import { notify } from "../../notify";
 import Paths from "../../routes";
 import BlueprintThemeProvider from "../../style/theme";
@@ -25,11 +24,10 @@ const DRAFT_SYMPTOM: Symptom = {
 };
 
 interface Props {
-  metricManager: MetricManager;
-  symptomManager: SymptomManager;
+  app: HealthTracker;
 }
 
-function SymptomEditor({ symptomManager, metricManager }: Props) {
+function SymptomEditor({ app }: Props) {
   const { symptomId } = useParams();
   const navigate = useNavigate();
 
@@ -41,7 +39,7 @@ function SymptomEditor({ symptomManager, metricManager }: Props) {
         return;
       }
 
-      const symptom = symptomManager.get(symptomId);
+      const symptom = app.symptomManager.get(symptomId);
       if (symptom === undefined) {
         navigate(Paths.symptoms);
         return;
@@ -50,14 +48,14 @@ function SymptomEditor({ symptomManager, metricManager }: Props) {
       setSymptom(symptom);
     }
 
-    const subscription = symptomManager.changes$.subscribe(() => {
+    const subscription = app.symptomManager.changes$.subscribe(() => {
       handleSymptomChanges();
     });
 
     handleSymptomChanges();
 
     return () => subscription.unsubscribe();
-  }, [symptomManager, symptomId, navigate]);
+  }, [app.symptomManager, symptomId, navigate]);
 
   function handleNameChange(event: any): void {
     const name: SymptomName = event.target.value;
@@ -70,15 +68,15 @@ function SymptomEditor({ symptomManager, metricManager }: Props) {
   }
 
   function handleSave(): void {
-    symptomManager.update({ symptom }).match({
-      ok: () => {
+    app.symptomManager.update({ symptom }).match({
+      Ok: () => {
         // Show pop up
         notify({
           message: `Symptom "${symptom.name}" successfully saved`,
           intent: "success",
         });
       },
-      err: (reason) => {
+      Err: (reason) => {
         notify({
           message: `ERROR: ${reason}`,
           intent: "danger",
@@ -90,18 +88,18 @@ function SymptomEditor({ symptomManager, metricManager }: Props) {
 
   function handleRemoveSymptom(id: SymptomId): void {
     console.log(`${SymptomEditor.name}.handleRemoveSymptom::removing symptom: ${id}`);
-    if (metricManager.isSymptomUsedInHistory({ symptomId: id })) {
+    if (app.metricManager.isSymptomUsedInHistory({ symptomId: id })) {
       alert(`This symptom is used in the history, cannot be removed!`);
       return;
     }
 
-    symptomManager.delete({ id });
+    app.symptomManager.delete({ id });
   }
 
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
-        <NavBar />
+        <NavBar app={app} />
         <p>
           symptom ID:&nbsp;&nbsp;&nbsp;<code>{symptom.id}</code>
         </p>

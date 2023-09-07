@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO metrics ( id, published_at, symptom_id, date, updated_at, intensity, notes )\n        VALUES ( $1, $2, $3, $4, $5, $6, $7 )\n        ON CONFLICT do UPDATE SET\n            published_at=$2,\n            symptom_id=$3,\n            date=$4,\n            updated_at=$5,\n            intensity=$6,\n            notes=$7\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "65c4972a1e7c1d09d9c449244f41f513e305919748301bebf0faac2fc055f0d8"
+}

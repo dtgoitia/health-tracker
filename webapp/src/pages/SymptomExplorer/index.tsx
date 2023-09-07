@@ -1,8 +1,8 @@
 import AddSymptom from "../../components/AddSymptom";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
-import { Symptom, SymptomName } from "../../domain/model";
-import { SymptomManager } from "../../domain/symptoms";
+import { HealthTracker } from "../../lib/app/app";
+import { Symptom, SymptomName } from "../../lib/domain/model";
 import Paths from "../../routes";
 import BlueprintThemeProvider from "../../style/theme";
 import { useEffect, useState } from "react";
@@ -10,37 +10,38 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 interface Props {
-  symptomManager: SymptomManager;
+  app: HealthTracker;
 }
-function SymptomExplorer({ symptomManager }: Props) {
+
+function SymptomExplorer({ app }: Props) {
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
 
   useEffect(() => {
-    const subscription = symptomManager.changes$.subscribe((_) => {
-      setSymptoms(symptomManager.getAll());
+    const subscription = app.symptomManager.changes$.subscribe((_) => {
+      setSymptoms(app.symptomManager.getAll());
     });
 
-    setSymptoms(symptomManager.getAll());
+    setSymptoms(app.symptomManager.getAll());
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [symptomManager]);
+  }, [app]);
 
   function handleAddSymptom(name: SymptomName, otherNames: SymptomName[]): void {
     console.log(
       `${SymptomExplorer.name}.handleAddSymptom::adding a new symptom: ${name}`
     );
-    symptomManager.add({ name, otherNames });
+    app.symptomManager.add({ name, otherNames });
   }
 
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
-        <NavBar />
+        <NavBar app={app} />
         <div>SymptomExplorer</div>
         {symptoms.map((symptom) => (
-          <OpenSymptomEditor symptom={symptom} />
+          <OpenSymptomEditor key={`${symptom.id}`} symptom={symptom} />
         ))}
         <AddSymptom add={handleAddSymptom} />
       </CenteredPage>

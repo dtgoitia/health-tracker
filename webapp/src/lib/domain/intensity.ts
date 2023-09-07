@@ -1,4 +1,4 @@
-import { unreachable } from "./devex";
+import { unreachable } from "../devex";
 import { Intensity } from "./model";
 
 export function getIntensityLevelShorthand(intensity: Intensity): string {

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO metrics ( id, published_at, symptom_id, date, updated_at, intensity, notes )\n        VALUES ( $1, $2, $3, $4, $5, $6, $7 )",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "67f6e576dd5e4c3b17ad0b25f85bb2a7afcb82ec084d23fca62bd743bd2ed9bb"
+}

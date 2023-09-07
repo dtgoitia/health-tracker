@@ -1,5 +1,5 @@
-import { Symptom, MetricId, groupByDay, Metric } from "../../../domain/model";
-import { SymptomManager } from "../../../domain/symptoms";
+import { Symptom, MetricId, Metric, ISODateString } from "../../../lib/domain/model";
+import { SymptomManager } from "../../../lib/domain/symptoms";
 import EditableRow from "./EditableRow";
 import Row from "./Row";
 import { Button, Switch } from "@blueprintjs/core";
@@ -128,3 +128,33 @@ function HistoryView({
 }
 
 export default HistoryView;
+
+function getDay(date: Date): ISODateString {
+  return date.toISOString().slice(0, 10);
+}
+
+type DatedMetrics = [ISODateString, Metric[]];
+
+function groupByDay(history: Metric[]): DatedMetrics[] {
+  let dayCursor: ISODateString = getDay(history[0].date);
+
+  let groupedMetrics: Metric[] = [];
+  const result: DatedMetrics[] = [];
+
+  history.forEach((metric, i) => {
+    const day = getDay(metric.date);
+    if (day === dayCursor) {
+      groupedMetrics.push(metric);
+    } else {
+      result.push([dayCursor, [...groupedMetrics]]);
+      groupedMetrics = [metric];
+      dayCursor = day;
+    }
+  });
+
+  if (groupedMetrics.length > 0) {
+    result.push([dayCursor, [...groupedMetrics]]);
+  }
+
+  return result;
+}

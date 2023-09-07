@@ -3,8 +3,8 @@ import {
   setMetricDate,
   setMetricIntensity,
   setMetricNotes,
-} from "../../../domain/metrics";
-import { Metric, Symptom, Intensity } from "../../../domain/model";
+} from "../../../lib/domain/metrics";
+import { Metric, Symptom, Intensity } from "../../../lib/domain/model";
 import { formatTime } from "./datetime";
 import { Button, Dialog, EditableText } from "@blueprintjs/core";
 import { TimePrecision, DatePicker } from "@blueprintjs/datetime";

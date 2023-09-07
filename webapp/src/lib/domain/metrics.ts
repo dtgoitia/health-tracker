@@ -1,24 +1,25 @@
 import {
-  datetimeToMs,
   DayAmount,
+  Milliseconds,
+  datetimeToMs,
   getDay,
   getLastNDates,
-  Milliseconds,
   now,
-} from "../datetimeUtils";
-import { unreachable } from "./devex";
-import { generateId } from "./hash";
-import { Hash, Intensity, Metric, MetricId, Notes, SymptomId } from "./model";
-import { SortAction } from "./sort";
-import { Err, Ok, Result } from "./success";
+} from "../../datetimeUtils";
+import { unreachable } from "../devex";
+import { generateId } from "../hash";
+import { SortAction } from "../sort";
 import {
-  SymptomAdded,
-  SymptomChange,
-  SymptomDeleted,
-  SymptomManager,
-  SymptomUpdated,
-} from "./symptoms";
+  ErrorReason,
+  Hash,
+  Intensity,
+  Metric,
+  MetricId,
+  Notes,
+  SymptomId,
+} from "./model";
 import { Observable, Subject } from "rxjs";
+import { Err, Ok, Result } from "safe-types";
 
 export const METRIC_PREFIX = "met";
 
@@ -36,9 +37,9 @@ interface DeleteteMetricArgs {
   id: MetricId;
 }
 
-interface ConstructorArgs {
-  symptomManager: SymptomManager;
-}
+type Error =
+  | { kind: "InitializationFailed" }
+  | { kind: "FailedToUpdateMetric"; reason: ErrorReason };
 
 export class MetricManager {
   public changes$: Observable<MetricChange>;
@@ -46,23 +47,22 @@ export class MetricManager {
   private changesSubject: Subject<MetricChange>;
   private metrics: Map<MetricId, Metric>;
   private metricsByDate: Map<Milliseconds, Set<MetricId>>;
-  private symptomManager: SymptomManager;
+  private initialized: boolean;
 
-  constructor({ symptomManager }: ConstructorArgs) {
+  constructor() {
     this.changesSubject = new Subject<MetricChange>();
     this.changes$ = this.changesSubject.asObservable();
-
-    this.symptomManager = symptomManager;
 
     this.metrics = new Map<MetricId, Metric>();
     this.metricsByDate = new Map<Milliseconds, Set<MetricId>>();
 
-    this.symptomManager.changes$.subscribe((change) => {
-      this.handleSymptomChange(change);
-    });
+    this.initialized = false;
   }
 
   public initialize({ metrics }: InitializeArgs): void {
+    if (this.initialized) {
+      throw unreachable(`${MetricManager.name} must only be initialized once`);
+    }
     for (const metric of metrics) {
       const { id } = metric;
       this.metrics.set(id, metric);
@@ -70,6 +70,9 @@ export class MetricManager {
       // Potential optimization: skip any item that is older than yesterday
       this.addMetricToDateIndex(metric);
     }
+
+    this.initialized = true;
+    this.changesSubject.next({ kind: "MetricManagerInitialized" });
   }
 
   public add({ symptomId, date, intensity, notes }: AddMetricArgs): void {
@@ -83,15 +86,16 @@ export class MetricManager {
       lastModified: now(),
     };
     this.metrics.set(id, metric);
-    this.changesSubject.next(new MetricAdded(id));
+    this.changesSubject.next({ kind: "MetricAdded", id });
   }
 
-  public update({ metric }: UpdateMetricArgs): Result {
+  public update({ metric }: UpdateMetricArgs): Result<null, Error> {
     const { id } = metric;
     if (this.metrics.has(id) === false) {
-      return Err(
-        `MetricManager.update::No metric found with ID ${id}, nothing will be updated`
-      );
+      return Err({
+        kind: "FailedToUpdateMetric",
+        reason: `MetricManager.update::No metric found with ID ${id}, nothing will be updated`,
+      });
     }
 
     // Update metrics-by-date index
@@ -103,8 +107,8 @@ export class MetricManager {
     this.metrics.set(id, metric);
     this.addMetricToDateIndex(metric);
 
-    this.changesSubject.next(new MetricUpdated(id));
-    return Ok(undefined);
+    this.changesSubject.next({ kind: "MetricUpdated", id });
+    return Ok(null);
   }
 
   private removeMetricFromDateIndex(metric: Metric): void {
@@ -131,7 +135,7 @@ export class MetricManager {
     }
 
     this.metrics.delete(id);
-    this.changesSubject.next(new MetricDeleted(id));
+    this.changesSubject.next({ kind: "MetricDeleted", id });
   }
 
   public get(id: MetricId): Metric | undefined {
@@ -140,6 +144,33 @@ export class MetricManager {
 
   public getAll(): Metric[] {
     return [...this.metrics.values()].sort(sortMetricsByDate);
+  }
+
+  /**
+   * Context:
+   *   When a metric is added, the domain emits domain-events so that, for
+   *   example, other parts of the system can pick up the new metric and share
+   *   it with the server.
+   *
+   * Problem:
+   *   If the logic described above was used to add externally-created metrics
+   *   (aka, the ones created in another device) to the domain, the current
+   *   system would think these metrics were created in the current system and
+   *   therefore they need to be shared with the server. But that is not the
+   *   case, as the server was who shared these metrics in the first place, so
+   *   the current system should ideally not push these metrics back to the
+   *   server again.
+   *
+   * Solution:
+   *   The domain emits a different domain-event when adding externally-created
+   *   metrics. This way, the current system can react differently and prevent
+   *   pushing these metrics back to the server again.
+   */
+  public addPulledData({ metrics }: { metrics: Metric[] }): void {
+    for (const metric of metrics) {
+      this.metrics.set(metric.id, metric);
+    }
+    this.changesSubject.next({ kind: "MetricsAddedFromExternalSource" });
   }
 
   public getMetricsOfLastNDays({ n }: { n: DayAmount }): Metric[] {
@@ -193,20 +224,6 @@ export class MetricManager {
 
     return id;
   }
-
-  private handleSymptomChange(change: SymptomChange): void {
-    // console.debug(`CompletedActivityManager.handleActivityChange:`, change);
-    switch (true) {
-      case change instanceof SymptomAdded:
-        return;
-      case change instanceof SymptomUpdated:
-        return;
-      case change instanceof SymptomDeleted:
-        return;
-      default:
-        throw unreachable(`unsupported change type: ${change}`);
-    }
-  }
 }
 
 function sortMetricsByDate(a: Metric, b: Metric): SortAction {
@@ -225,30 +242,23 @@ function sortMetricsByDate(a: Metric, b: Metric): SortAction {
   }
 }
 
-export class MetricAdded {
-  constructor(public readonly id: MetricId) {}
-}
-
-export class MetricUpdated {
-  constructor(public readonly id: MetricId) {}
-}
-
-export class MetricDeleted {
-  constructor(public readonly id: MetricId) {}
-}
-
-export type MetricChange = MetricAdded | MetricUpdated | MetricDeleted;
+export type MetricChange =
+  | { kind: "MetricManagerInitialized" }
+  | { kind: "MetricAdded"; id: MetricId }
+  | { kind: "MetricUpdated"; id: MetricId }
+  | { kind: "MetricDeleted"; id: MetricId }
+  | { kind: "MetricsAddedFromExternalSource" };
 
 export function setMetricDate(metric: Metric, date: Date): Metric {
-  return { ...metric, date, lastModified: now() };
+  return { ...metric, date, lastModified: new Date() };
 }
 
 export function setMetricIntensity(metric: Metric, intensity: Intensity): Metric {
-  return { ...metric, intensity, lastModified: now() };
+  return { ...metric, intensity, lastModified: new Date() };
 }
 
 export function setMetricNotes(metric: Metric, notes: Notes): Metric {
-  return { ...metric, notes, lastModified: now() };
+  return { ...metric, notes, lastModified: new Date() };
 }
 
 export function getIntensityLevelShorthand(intensity: Intensity): string {

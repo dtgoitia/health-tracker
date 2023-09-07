@@ -6,7 +6,9 @@ on:
       - master
 
 jobs:
+
   deploy-webapp:
+    name: Deploy PWA to GitHub
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -14,7 +16,7 @@ jobs:
         working-directory: webapp
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Use Node.js
         uses: actions/setup-node@v1
@@ -50,3 +52,33 @@ jobs:
         env:
           PUBLIC_GITHUB_ACCOUNT_TOKEN: ${{ secrets.PUBLIC_GITHUB_ACCOUNT_TOKEN }}
           PUBLIC_GITHUB_REPOSITORY: ${{ secrets.PUBLIC_GITHUB_REPOSITORY }}
+
+  build-and-publish-api-container-image:
+    name: Build API container image and publish it to GitLab
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout last commit
+        uses: actions/checkout@v3
+
+      - name: Set up Docker BuildX
+        uses: docker/setup-buildx-action@v2
+
+      - name: Docker meta
+        uses: docker/metadata-action@v4
+        id: meta  # used later to refer to the outputs of this step
+        with:
+          images: registry.gitlab.com/dtgoitia/health-tracker
+
+      - name: Login to GitLab Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: registry.gitlab.com
+          username: ${{ secrets.GITLAB_CONTAINER_REGISTRY_USERNAME }}
+          password: ${{ secrets.GITLAB_CONTAINER_REGISTRY_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: api
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}

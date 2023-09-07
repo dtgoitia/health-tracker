@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO symptoms ( id, published_at, name, other_names, updated_at )\n        VALUES ( $1, $2, $3, $4, $5 )",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "927268e3a7cba580750e7557f6d18df19cf3209d3e63c54c0268a6250214f6cf"
+}

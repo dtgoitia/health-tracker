@@ -1,4 +1,4 @@
-import { SymptomName } from "../domain/model";
+import { SymptomName } from "../lib/domain/model";
 import { Button } from "@blueprintjs/core";
 import { useState } from "react";
 

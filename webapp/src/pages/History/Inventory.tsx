@@ -1,4 +1,4 @@
-import { Symptom, SymptomId } from "../../domain/model";
+import { Symptom, SymptomId } from "../../lib/domain/model";
 import { Button, Collapse } from "@blueprintjs/core";
 import styled from "styled-components";
 

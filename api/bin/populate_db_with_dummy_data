@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+set -o nounset
+set -o pipefail
+set -o errexit
+
+touch $SQLITE_DB_PATH
+
+echo "Applying migrations..."
+sqlx migrate run
+
+check_if_service_is_alive () {
+  curl --silent http://127.0.0.1:3000/api/health \
+    || (echo "API is not alive" && exit 1)
+}
+
+create_symptom () {
+  name="${1}"
+  curl -s -X 'POST' \
+    'http://localhost:3000/api/symptoms' \
+    -H 'accept: application/json; charset=utf-8' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -d "{\"name\":\"${name}\",\"other_names\":[],\"updated_at\":\"2023-08-05T10:03:27+01:00\"}" \
+  | jq '.created_symptom.id' --raw-output
+}
+
+create_metric () {
+  symptom_id="${1}"
+  curl -s -X 'POST' \
+    'http://localhost:3000/api/metrics' \
+    -H 'accept: application/json; charset=utf-8' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -d "{\"symptom_id\":\"${symptom_id}\",\"date\":\"2023-08-10T10:50:00+01:00\",\"updated_at\":\"2023-08-10T10:50:00+01:00\",\"intensity\":\"high\",\"notes\":\"a very decent note\"}" \
+  | jq '.created_metric.id' --raw-output
+}
+
+update_metric () {
+  metric_id="${1}"
+  curl -s -X 'PATCH' \
+    "http://localhost:3000/api/metrics/${metric_id}" \
+    -H 'accept: application/json; charset=utf-8' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -d "{\"date\":\"2023-08-04T00:00:00+00:00\"}" \
+  | jq '.updated_metric' --raw-output
+}
+
+echo "checking that API is alive..."
+check_if_service_is_alive
+echo "API is alive"
+
+echo "creating symptoms..."
+headache_id="$( create_symptom "headache" )"
+sore_left_knee_id="$( create_symptom "sore left knee" )"
+create_symptom "sore right knee"
+
+echo "creating metrics..."
+create_metric $headache_id
+create_metric $sore_left_knee_id
+create_metric $headache_id
+create_metric $headache_id
+metric_id="$( create_metric $sore_left_knee_id )"
+
+update_metric $metric_id > /dev/null
+
+sleep 0.1
+echo ""
+echo "Current DB..."
+sqlite3 $SQLITE_DB_PATH 'select * from symptoms;'
+echo ""
+sqlite3 $SQLITE_DB_PATH 'select * from metrics;'

@@ -1,4 +1,4 @@
-import { Metric, Symptom } from "../../../domain/model";
+import { Metric, Symptom } from "../../../lib/domain/model";
 import { formatTime } from "./datetime";
 import styled from "styled-components";
 

@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        UPDATE metrics\n        SET\n            published_at=$2,\n            symptom_id=$3,\n            date=$4,\n            updated_at=$5,\n            intensity=$6,\n            notes=$7\n        WHERE id=$1\n        RETURNING *\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "published_at",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "symptom_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "date",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "intensity",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "notes",
+        "ordinal": 6,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "fba2bb77b05bac88a2ba86733e36c773595603de30671a7871cf2c6e37079418"
+}

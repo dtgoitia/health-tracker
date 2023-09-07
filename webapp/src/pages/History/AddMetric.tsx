@@ -1,10 +1,5 @@
-import {
-  Symptom,
-  SymptomId,
-  findSymptomById,
-  Intensity,
-  Notes,
-} from "../../domain/model";
+import { Symptom, SymptomId, Intensity, Notes } from "../../lib/domain/model";
+import { findSymptomById } from "../../lib/domain/symptoms";
 import { Button } from "@blueprintjs/core";
 import { useState } from "react";
 import styled from "styled-components";

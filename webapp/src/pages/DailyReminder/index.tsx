@@ -1,7 +1,7 @@
 import { now } from "../../datetimeUtils";
-import { MetricDeleted, MetricManager, MetricUpdated } from "../../domain/metrics";
-import { Intensity, Metric, Symptom, SymptomId } from "../../domain/model";
-import { sortSymptomsAlphabetically, SymptomManager } from "../../domain/symptoms";
+import { MetricManager } from "../../lib/domain/metrics";
+import { Intensity, Metric, Symptom, SymptomId } from "../../lib/domain/model";
+import { sortSymptomsAlphabetically, SymptomManager } from "../../lib/domain/symptoms";
 import SymptomSuggestion from "./SymptomSuggestion";
 import { Button, Card, Collapse } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
@@ -11,13 +11,14 @@ interface Props {
   symptomManager: SymptomManager;
   metricManager: MetricManager;
 }
+
 function DailyReminder({ symptomManager, metricManager }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [lastMetrics, setLastMetrics] = useState<Metric[]>([]);
 
   useEffect(() => {
     const subscription = metricManager.changes$.subscribe((change) => {
-      if (change instanceof MetricUpdated || change instanceof MetricDeleted) {
+      if (change.kind === "MetricUpdated" || change.kind === "MetricDeleted") {
         setLastMetrics(metricManager.getMetricsOfLastNDays({ n: 2 }));
       }
     });

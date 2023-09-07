@@ -1,5 +1,5 @@
 import { now } from "../../datetimeUtils";
-import { Metric, Symptom } from "../../domain/model";
+import { Metric, Symptom } from "../../lib/domain/model";
 import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import styled from "styled-components";

@@ -1,35 +1,82 @@
-WEBAPP_NAME:=health-tracker-webapp
+APP_NAME:=health-tracker
+WEBAPP_NAME:=$(APP_NAME)-webapp
+API_NAME:=$(APP_NAME)-api
 
-install-dev-tools:
+set_up_development_environment:
+	@echo ""
+	@echo Installing git hooks...
+	make install_dev_tools
+
+	@echo ""
+	@echo ""
+	@echo Installing NPM dependencies outside of the container, to support pre-push builds...
+	@# this step is necessary because otherwise docker compose creates a node_modules
+	@# folder with root permissions and outside-container build fails
+	cd webapp; npm ci
+
+	@echo ""
+	@echo ""
+	@echo To start webapp:  make run_webapp
+	@echo To start api:     make run_api
+
+install_dev_tools:
 	pre-commit install  # pre-commit is (default)
 	pre-commit install --hook-type pre-push
 
-uninstall-dev-tools:
+uninstall_dev_tools:
 	pre-commit uninstall  # pre-commit is (default)
 	pre-commit uninstall --hook-type pre-push
 
-run-webapp:
+
+#===============================================================================
+#
+#   webapp
+#
+#===============================================================================
+
+run_webapp:
 	scripts/print_local_ip_via_qr.sh
-	docker-compose up $(WEBAPP_NAME)
+	docker compose up $(WEBAPP_NAME)
 
 # Recreate web app docker image
-rebuild-webapp:
-	docker-compose down
-	docker-compose build $(WEBAPP_NAME)
+rebuild_webapp:
+	docker compose down
+	docker compose build $(WEBAPP_NAME)
 
-test-dev-webapp:
-	docker-compose run --rm $(WEBAPP_NAME) npm test
+test_dev_webapp:
+	docker compose run --rm $(WEBAPP_NAME) npm test
 
-shell-webapp:
-	docker-compose run --rm $(WEBAPP_NAME) bash
+shell_webapp:
+	docker compose run --rm $(WEBAPP_NAME) bash
 
-deploy-webapp-from-local:
+deploy_webapp_from_local:
 	cd ./webapp \
 		&& npm run deploy_from_local
-	@# TODO: docker-compose run --rm $(WEBAPP_NAME) npm run deploy_from_local
+	@# TODO: docker compose run --rm $(WEBAPP_NAME) npm run deploy_from_local
 
-build-webapp:
+build_webapp:
 	scripts/build_webapp.sh
 
-set-up-development-environment: install-dev-tools rebuild-webapp
-	cd webapp; npm ci
+
+#===============================================================================
+#
+#   API
+#
+#===============================================================================
+
+run_api:
+	docker compose up $(API_NAME)
+
+rebuild_api:
+	docker compose down $(API_NAME)
+	docker compose build $(API_NAME)
+
+delete_api_db_file:
+	rm -f $(SQLITE_DB_PATH)
+
+create_api_db_file:
+	touch $(SQLITE_DB_PATH)
+
+deploy_api:
+	@echo "Make sure to run this in the server"
+	api/bin/pull_latest_and_run

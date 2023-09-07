@@ -80,19 +80,23 @@ class StoredItem<T> {
   }
 }
 
-export class Storage {
+export class LocalStorage {
+  settings: StoredItem<object | undefined>;
   symptoms: StoredItem<object[] | undefined>;
   history: StoredItem<object[] | undefined>;
+  changesToPush: StoredItem<object[] | undefined>;
+  lastPullDate: StoredItem<string | undefined>;
 
   constructor() {
     const prefix = STORAGE_PREFIX;
     this.symptoms = new StoredItem(`${prefix}__symptoms`, ValueType.object);
     this.history = new StoredItem(`${prefix}__history`, ValueType.object);
-    // this.b = new StoredItem("b", 123);
-    // this.c = new StoredItem("c");
+    this.settings = new StoredItem(`${prefix}__settings`, ValueType.object);
+    this.changesToPush = new StoredItem(`${prefix}__changesToPush`, ValueType.object);
+    this.lastPullDate = new StoredItem(`${prefix}__lastPullDate`, ValueType.string);
   }
 }
 
-const storage = new Storage();
+const storage = new LocalStorage();
 
 export default storage;

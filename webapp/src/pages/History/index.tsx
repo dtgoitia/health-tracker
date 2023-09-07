@@ -3,10 +3,10 @@ import AddSymptom from "../../components/AddSymptom";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
 import { now } from "../../datetimeUtils";
-import { MetricManager } from "../../domain/metrics";
+import { HealthTracker } from "../../lib/app/app";
+import { filterSymptoms } from "../../lib/app/symptoms";
 import {
   FilterQuery,
-  filterSymptoms,
   Intensity,
   Metric,
   MetricId,
@@ -14,9 +14,7 @@ import {
   Symptom,
   SymptomId,
   SymptomName,
-} from "../../domain/model";
-import { SymptomManager } from "../../domain/symptoms";
-import storage from "../../localStorage";
+} from "../../lib/domain/model";
 import BlueprintThemeProvider from "../../style/theme";
 import DailyReminder from "../DailyReminder";
 import AddMetric from "./AddMetric";
@@ -28,46 +26,44 @@ import SearchBox from "./SearchBox";
 import { useEffect, useState } from "react";
 
 interface Props {
-  symptomManager: SymptomManager;
-  metricManager: MetricManager;
+  app: HealthTracker;
 }
-function HistoryPage({ symptomManager, metricManager }: Props) {
+
+function HistoryPage({ app }: Props) {
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [selected, setSelected] = useState<SymptomId | undefined>();
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [userIsSearching, setUserIsSearching] = useState(false);
 
   useEffect(() => {
-    const symptomSubscription = symptomManager.changes$.subscribe((_) => {
-      setSymptoms(symptomManager.getAll());
+    const symptomSubscription = app.symptomManager.changes$.subscribe((_) => {
+      setSymptoms(app.symptomManager.getAll());
     });
-    const metricSubscription = metricManager.changes$.subscribe((_) => {
-      setMetrics(metricManager.getAll());
+    const metricSubscription = app.metricManager.changes$.subscribe((_) => {
+      setMetrics(app.metricManager.getAll());
     });
 
-    setSymptoms(symptomManager.getAll());
-    setMetrics(metricManager.getAll());
+    setSymptoms(app.symptomManager.getAll());
+    setMetrics(app.metricManager.getAll());
 
     return () => {
       symptomSubscription.unsubscribe();
       metricSubscription.unsubscribe();
     };
-  }, [symptomManager, metricManager]);
+  }, [app]);
 
   const [filterQuery, setFilterQuery] = useState<FilterQuery>("");
-  storage.symptoms.set(symptoms);
 
   function handleAddSymptom(name: SymptomName, otherNames: SymptomName[]): void {
     console.log(`${HistoryPage.name}.handleAddSymptom::adding a new symptom: ${name}`);
-    symptomManager.add({ name, otherNames });
+    app.symptomManager.add({ name, otherNames });
   }
 
   function handleAddMetric(id: SymptomId, intensity: Intensity, notes: Notes): void {
     console.log(
       `${HistoryPage.name}.handleAddMetric::adding a new metric: symptom ID ${id}`
     );
-    metricManager.add({ symptomId: id, intensity, notes, date: now() });
-    // setSelected(undefined);
+    app.metricManager.add({ symptomId: id, intensity, notes, date: now() });
   }
 
   const handleSelectSymptom = (id: SymptomId) => {
@@ -75,15 +71,15 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
   };
 
   function handleMetricUpdate(updated: Metric): void {
-    metricManager.update({ metric: updated });
+    app.metricManager.update({ metric: updated });
   }
 
   function handleMetricDeletion(id: MetricId): void {
-    metricManager.delete({ id });
+    app.metricManager.delete({ id });
   }
 
   function handleMetricDuplication(ids: Set<MetricId>): void {
-    metricManager.duplicate({ ids });
+    app.metricManager.duplicate({ ids });
   }
 
   const clearSearch = () => {
@@ -94,9 +90,12 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
-        <NavBar />
+        <NavBar app={app} />
 
-        <DailyReminder symptomManager={symptomManager} metricManager={metricManager} />
+        <DailyReminder
+          symptomManager={app.symptomManager}
+          metricManager={app.metricManager}
+        />
 
         <SearchBox
           query={filterQuery}
@@ -117,7 +116,7 @@ function HistoryPage({ symptomManager, metricManager }: Props) {
 
         <HistoryView
           history={metrics}
-          symptomManager={symptomManager}
+          symptomManager={app.symptomManager}
           updateMetric={handleMetricUpdate}
           deleteMetric={handleMetricDeletion}
           duplicateMetrics={handleMetricDuplication}

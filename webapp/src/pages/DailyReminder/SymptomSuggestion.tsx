@@ -1,5 +1,5 @@
 import IntensitySelector from "../../components/IntensitySelector";
-import { Intensity, Symptom, SymptomId } from "../../domain/model";
+import { Intensity, Symptom, SymptomId } from "../../lib/domain/model";
 import { Button } from "@blueprintjs/core";
 import { useState } from "react";
 import styled from "styled-components";

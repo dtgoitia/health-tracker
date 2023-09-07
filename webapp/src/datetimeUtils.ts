@@ -44,3 +44,30 @@ export function getLastNDates({ n }: { n: DayAmount }): Date[] {
 
   return result;
 }
+
+/**
+ * Return the earliest of both provided `Date`s
+ */
+export function latest({ a, b }: { a: Date; b: Date }): Date {
+  return a.getTime() < b.getTime() ? b : a;
+}
+
+export function toISOStringWithLocalTimezone(date: Date) {
+  const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // In 2023, apparently Swedish (sv-SE) is the closest locale to ISO format amongst all locales.
+  // Even "ISO" and "UTC" locales return widely different results.
+  return Intl.DateTimeFormat("sv-SE", {
+    timeZone: localTZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    // fractionalSecondDigits: 0,
+    hour12: false,
+    timeZoneName: "short",
+  })
+    .format(date)
+    .replace(/ GMT([+-])(.*)/, " $10$2:00");
+}

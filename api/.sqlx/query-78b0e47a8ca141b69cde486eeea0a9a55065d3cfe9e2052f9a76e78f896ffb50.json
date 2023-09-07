@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO symptoms ( id, published_at, name, other_names, updated_at )\n        VALUES ( $1, $2, $3, $4, $5 )\n        ON CONFLICT do UPDATE SET\n            published_at=$2,\n            name=$3,\n            other_names=$4,\n            updated_at=$5\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "78b0e47a8ca141b69cde486eeea0a9a55065d3cfe9e2052f9a76e78f896ffb50"
+}
