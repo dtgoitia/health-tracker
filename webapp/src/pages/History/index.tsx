@@ -4,6 +4,7 @@ import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
 import { now } from "../../datetimeUtils";
 import { HealthTracker } from "../../lib/app/app";
+import { filterMetrics } from "../../lib/app/metrics";
 import { filterSymptoms } from "../../lib/app/symptoms";
 import {
   FilterQuery,
@@ -88,6 +89,8 @@ function HistoryPage({ app }: Props) {
     setUserIsSearching(false);
   };
 
+  const filteredSymptoms = filterSymptoms(symptoms, filterQuery);
+
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
@@ -100,7 +103,7 @@ function HistoryPage({ app }: Props) {
           onFocus={() => setUserIsSearching(true)}
         />
         <InventoryView
-          symptoms={filterSymptoms(symptoms, filterQuery)}
+          symptoms={filteredSymptoms}
           selectSymptom={handleSelectSymptom}
           collapse={!userIsSearching}
         />
@@ -111,7 +114,7 @@ function HistoryPage({ app }: Props) {
         />
 
         <HistoryView
-          history={metrics}
+          history={filterMetrics({ symptomsToShow: filteredSymptoms, metrics })}
           symptomManager={app.symptomManager}
           updateMetric={handleMetricUpdate}
           deleteMetric={handleMetricDeletion}
