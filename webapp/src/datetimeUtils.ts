@@ -5,9 +5,19 @@ export function now(): Date {
   return new Date(new Date().setMilliseconds(0));
 }
 
+/* Return the provided `Date` with hours, minutes, seconds and milliseconds to zero. */
+export function toDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
 function today(): Date {
-  const _now = now();
-  return new Date(_now.getUTCFullYear(), _now.getUTCMonth(), _now.getUTCDate());
+  return toDay(now());
+}
+
+export function yesterday(): Date {
+  const _today = toDay(now()).getTime();
+  const oneDay = 24 * 60 * 60 * 1000;
+  return new Date(_today - oneDay);
 }
 
 function n_days({ n }: { n: DayAmount }): Milliseconds {

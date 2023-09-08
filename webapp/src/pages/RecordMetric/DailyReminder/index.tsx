@@ -1,7 +1,7 @@
-import { now } from "../../datetimeUtils";
-import { MetricManager } from "../../lib/domain/metrics";
-import { Intensity, Metric, Symptom, SymptomId } from "../../lib/domain/model";
-import { sortSymptomsAlphabetically, SymptomManager } from "../../lib/domain/symptoms";
+import { now } from "../../../datetimeUtils";
+import { MetricManager } from "../../../lib/domain/metrics";
+import { Intensity, Metric, Symptom, SymptomId } from "../../../lib/domain/model";
+import { SymptomManager, sortSymptomsAlphabetically } from "../../../lib/domain/symptoms";
 import SymptomSuggestion from "./SymptomSuggestion";
 import { Button, Card, Collapse } from "@blueprintjs/core";
 import { useEffect, useState } from "react";

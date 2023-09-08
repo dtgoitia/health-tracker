@@ -1,8 +1,7 @@
 import ReloadPage from "../../ReloadPage";
-import AddSymptom from "../../components/AddSymptom";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
-import { now } from "../../datetimeUtils";
+import { now, yesterday } from "../../datetimeUtils";
 import { HealthTracker } from "../../lib/app/app";
 import { filterSymptoms } from "../../lib/app/symptoms";
 import {
@@ -13,22 +12,20 @@ import {
   Notes,
   Symptom,
   SymptomId,
-  SymptomName,
 } from "../../lib/domain/model";
 import BlueprintThemeProvider from "../../style/theme";
-import AddMetric from "./AddMetric";
-import DownloadCsv from "./DownloadCsv";
-import { DownloadJson } from "./DownloadJson";
-import HistoryView from "./HistoryView";
-import InventoryView from "./Inventory";
-import SearchBox from "./SearchBox";
+import AddMetric from "../History/AddMetric";
+import HistoryView from "../History/HistoryView";
+import InventoryView from "../History/Inventory";
+import SearchBox from "../History/SearchBox";
+import DailyReminder from "./DailyReminder";
 import { useEffect, useState } from "react";
 
 interface Props {
   app: HealthTracker;
 }
 
-function HistoryPage({ app }: Props) {
+export function RecordMetricPage({ app }: Props) {
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [selected, setSelected] = useState<SymptomId | undefined>();
   const [metrics, setMetrics] = useState<Metric[]>([]);
@@ -39,11 +36,16 @@ function HistoryPage({ app }: Props) {
       setSymptoms(app.symptomManager.getAll());
     });
     const metricSubscription = app.metricManager.changes$.subscribe((_) => {
-      setMetrics(app.metricManager.getAll());
+      const fullHistory = app.metricManager.getAll();
+      const todayOrLater = keepTodayOrAfter(fullHistory);
+      setMetrics(todayOrLater);
     });
 
     setSymptoms(app.symptomManager.getAll());
-    setMetrics(app.metricManager.getAll());
+
+    const fullHistory = app.metricManager.getAll();
+    const todayOrLater = keepTodayOrAfter(fullHistory);
+    setMetrics(todayOrLater);
 
     return () => {
       symptomSubscription.unsubscribe();
@@ -53,16 +55,9 @@ function HistoryPage({ app }: Props) {
 
   const [filterQuery, setFilterQuery] = useState<FilterQuery>("");
 
-  function handleAddSymptom(name: SymptomName, otherNames: SymptomName[]): void {
-    console.log(
-      `${HistoryPage.name}.${handleAddSymptom.name}::adding a new symptom: ${name}`
-    );
-    app.symptomManager.add({ name, otherNames });
-  }
-
   function handleAddMetric(id: SymptomId, intensity: Intensity, notes: Notes): void {
     console.log(
-      `${HistoryPage.name}.${handleAddMetric}::adding a new metric: symptom ID ${id}`
+      `${RecordMetricPage.name}.${handleAddMetric.name}::adding a new metric: symptom ID ${id}`
     );
     app.metricManager.add({ symptomId: id, intensity, notes, date: now() });
   }
@@ -93,6 +88,11 @@ function HistoryPage({ app }: Props) {
       <CenteredPage>
         <NavBar app={app} />
 
+        <DailyReminder
+          symptomManager={app.symptomManager}
+          metricManager={app.metricManager}
+        />
+
         <SearchBox
           query={filterQuery}
           onChange={setFilterQuery}
@@ -117,13 +117,18 @@ function HistoryPage({ app }: Props) {
           deleteMetric={handleMetricDeletion}
           duplicateMetrics={handleMetricDuplication}
         />
-        <AddSymptom add={handleAddSymptom} />
-        <DownloadCsv symptoms={symptoms} history={metrics} />
-        <DownloadJson symptoms={symptoms} history={metrics} />
         <ReloadPage />
       </CenteredPage>
     </BlueprintThemeProvider>
   );
 }
 
-export default HistoryPage;
+function keepTodayOrAfter(all: Metric[]): Metric[] {
+  const t = yesterday().getTime();
+
+  function isYesterdayOrAfter(date: Date): boolean {
+    return t < date.getTime();
+  }
+
+  return all.filter((record) => isYesterdayOrAfter(record.date));
+}

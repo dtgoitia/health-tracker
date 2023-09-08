@@ -1,6 +1,7 @@
 import { HealthTracker } from "./lib/app/app";
 import HistoryPage from "./pages/History";
 import PageNotFound from "./pages/PageNotFound";
+import { RecordMetricPage } from "./pages/RecordMetric";
 import SettingsPage from "./pages/Settings";
 import SymptomEditor from "./pages/SymptomEditor";
 import SymptomExplorer from "./pages/SymptomExplorer";
@@ -19,7 +20,8 @@ function AppUi({ app }: Props) {
 
   return (
     <Routes>
-      <Route path={Paths.root} element={<HistoryPage app={app} />} />
+      <Route path={Paths.root} element={<RecordMetricPage app={app} />} />
+      <Route path={Paths.history} element={<HistoryPage app={app} />} />
       <Route path={Paths.symptoms} element={<SymptomExplorer app={app} />} />
       <Route path={Paths.symptomsEditor} element={<SymptomEditor app={app} />} />
       <Route path={Paths.settings} element={<SettingsPage app={app} />} />
