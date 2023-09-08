@@ -82,7 +82,7 @@ function getSyncStatusIcon({ status }: { status: SyncStatus }): {
       return {
         icon: "warning-sign",
         grayedOut: false,
-        text: "offline, and pending changes",
+        text: "online, but sync failed",
       };
     case SyncStatus.onlineAndSynced:
       return { icon: "tick", grayedOut: true, text: "synced" };
