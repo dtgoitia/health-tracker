@@ -17,10 +17,8 @@ function DailyReminder({ symptomManager, metricManager }: Props) {
   const [lastMetrics, setLastMetrics] = useState<Metric[]>([]);
 
   useEffect(() => {
-    const subscription = metricManager.changes$.subscribe((change) => {
-      if (change.kind === "MetricUpdated" || change.kind === "MetricDeleted") {
-        setLastMetrics(metricManager.getMetricsOfLastNDays({ n: 2 }));
-      }
+    const subscription = metricManager.changes$.subscribe(() => {
+      setLastMetrics(metricManager.getMetricsOfLastNDays({ n: 2 }));
     });
 
     setLastMetrics(metricManager.getMetricsOfLastNDays({ n: 2 }));
