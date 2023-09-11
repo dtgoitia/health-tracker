@@ -29,6 +29,8 @@ export function setUpApp(): HealthTracker {
     healthTrackerApi,
     browserStorage,
     settingsManager,
+    symptomManager,
+    metricManager,
   });
 
   const app = new HealthTracker({

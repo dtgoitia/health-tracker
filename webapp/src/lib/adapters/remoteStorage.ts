@@ -1,8 +1,10 @@
 import { PULL_OVERLAP_SECONDS, REMOTE_LOOP_WAIT } from "../../config";
 import { now } from "../../datetimeUtils";
 import { assertNever } from "../../exhaustive-match";
+import { MetricManager } from "../domain/metrics";
 import { ErrorReason, Metric, MetricId, Symptom, SymptomId } from "../domain/model";
 import { SettingsManager } from "../domain/settings";
+import { SymptomManager } from "../domain/symptoms";
 import { ApiError, HealthTrackerApi, ReadAllApiError } from "./api";
 import { BrowserStorage } from "./browserStorage";
 import { ChangeToPush } from "./model";
@@ -37,6 +39,8 @@ interface ConstructorArgs {
   healthTrackerApi: HealthTrackerApi;
   browserStorage: BrowserStorage;
   settingsManager: SettingsManager;
+  symptomManager: SymptomManager;
+  metricManager: MetricManager;
 }
 
 export class RemoteStorage {
@@ -49,13 +53,23 @@ export class RemoteStorage {
   private healthTrackerApi: HealthTrackerApi;
   private browserStorage: BrowserStorage;
   private settingsManager: SettingsManager;
+  private symptomManager: SymptomManager;
+  private metricManager: MetricManager;
   private changesToPush: Map<ChangesId, ChangeToPush>;
 
-  constructor({ healthTrackerApi, browserStorage, settingsManager }: ConstructorArgs) {
+  constructor({
+    healthTrackerApi,
+    browserStorage,
+    settingsManager,
+    symptomManager,
+    metricManager,
+  }: ConstructorArgs) {
     this.shouldProcess = false;
     this.healthTrackerApi = healthTrackerApi;
     this.browserStorage = browserStorage;
     this.settingsManager = settingsManager;
+    this.symptomManager = symptomManager;
+    this.metricManager = metricManager;
     this.changesToPush = new Map<ChangesId, ChangeToPush>();
 
     this.changeSubject = new Subject<RemoteStorageChange>();
@@ -304,7 +318,12 @@ export class RemoteStorage {
 
     const pulled = pulledResult.unwrap();
 
-    const toShareWithDomain = this.comparePulledDataWithQueuedToPushData(pulled);
+    // Remove stale 'changes to push' (aka, data in app layer)
+    const toCompareWithDomain = this.comparePulledDataWithQueuedToPushData(pulled);
+
+    // Remove stale pulled changes (aka, data in domain layer)
+    const toShareWithDomain = this.comparePulledDataWithDomainData(toCompareWithDomain);
+
     if (toShareWithDomain.symptoms.length > 0 || toShareWithDomain.metrics.length > 0) {
       this.changeSubject.next({ kind: "NewDataPulledFromApi", data: toShareWithDomain });
     }
@@ -401,13 +420,13 @@ export class RemoteStorage {
     console.debug(`${_logPrefix}::started`);
 
     if (this.changesToPush.size === 0) {
-      // there are no changes queues waiting to be pushed that might conflict with the
+      // there are no queued changes waiting to be pushed that might conflict with the
       // data pulled from the API
       console.debug(`${_logPrefix}::no changes to push found`);
       return { symptoms, metrics };
     }
 
-    const toShareWithDomain: {
+    const toCompareWithDomain: {
       symptoms: Symptom[];
       metrics: Metric[];
     } = {
@@ -436,7 +455,7 @@ export class RemoteStorage {
       // the symptom fetched from the API is newer, drop the change that was waiting to
       // be pushed so that the domain gets the API data
       console.debug(`${_logPrefix}::symptom ${id}: pulled data is newer`);
-      toShareWithDomain.symptoms.push(symptom);
+      toCompareWithDomain.symptoms.push(symptom);
       this.changesToPush.delete(id);
     }
 
@@ -461,8 +480,88 @@ export class RemoteStorage {
       // the metric fetched from the API is newer, drop the change that was waiting to
       // be pushed so that the domain gets the API data
       console.debug(`${_logPrefix}::metric ${id}: pulled data is newer`);
-      toShareWithDomain.metrics.push(metric);
+      toCompareWithDomain.metrics.push(metric);
       this.changesToPush.delete(metric.id);
+    }
+
+    console.debug(`${_logPrefix}::completed`);
+
+    return toCompareWithDomain;
+  }
+
+  private comparePulledDataWithDomainData({
+    symptoms,
+    metrics,
+  }: {
+    symptoms: Symptom[];
+    metrics: Metric[];
+  }): {
+    symptoms: Symptom[];
+    metrics: Metric[];
+  } {
+    const _logPrefix = `${RemoteStorage.name}.${this.comparePulledDataWithDomainData.name}`;
+    console.debug(`${_logPrefix}::started`);
+
+    const toShareWithDomain: {
+      symptoms: Symptom[];
+      metrics: Metric[];
+    } = {
+      symptoms: [],
+      metrics: [],
+    };
+
+    for (const pulled of symptoms) {
+      const { id } = pulled;
+      const inDevice = this.symptomManager.get(id);
+
+      if (inDevice === undefined) {
+        toShareWithDomain.symptoms.push(pulled);
+        console.debug(
+          `${_logPrefix}::symptom ${id} does not exist locally, pulled symptom kept`
+        );
+        continue;
+      }
+
+      if (pulled.lastModified.getTime() < inDevice.lastModified.getTime()) {
+        console.debug(
+          `${_logPrefix}::symptom ${id} local version is newer than the pulled one,` +
+            ` discarding pulled one`
+        );
+        continue;
+      }
+
+      console.debug(
+        `${_logPrefix}::symptom ${id} local version is older than the pulled one,` +
+          ` discarding local symptom`
+      );
+      toShareWithDomain.symptoms.push(pulled);
+    }
+
+    for (const pulled of metrics) {
+      const { id } = pulled;
+      const inDevice = this.metricManager.get(id);
+
+      if (inDevice === undefined) {
+        toShareWithDomain.metrics.push(pulled);
+        console.debug(
+          `${_logPrefix}::metric ${id} does not exist locally, pulled metric kept`
+        );
+        continue;
+      }
+
+      if (pulled.lastModified.getTime() < inDevice.lastModified.getTime()) {
+        console.debug(
+          `${_logPrefix}::metric ${id} local version is newer than the pulled one,` +
+            ` discarding pulled one`
+        );
+        continue;
+      }
+
+      console.debug(
+        `${_logPrefix}::metric ${id} local version is older than the pulled one,` +
+          ` discarding local metric`
+      );
+      toShareWithDomain.metrics.push(pulled);
     }
 
     console.debug(`${_logPrefix}::completed`);
