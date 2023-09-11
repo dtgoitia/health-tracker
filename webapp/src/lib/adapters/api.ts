@@ -665,7 +665,7 @@ const map = {
         return Err(updatedAt.err().unwrap());
       }
 
-      const date = dateFromString(apiMetric.updated_at);
+      const date = dateFromString(apiMetric.date);
       if (date.is_err()) {
         return Err(date.err().unwrap());
       }
