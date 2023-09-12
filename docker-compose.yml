@@ -5,7 +5,7 @@ services:
     build:
       context: ./webapp
       dockerfile: Dockerfile
-    image: health-list-webapp
+    image: health-tracker-webapp
     container_name: health-tracker-webapp
     command: "npm start"
     ports:
