@@ -1,4 +1,5 @@
-import { buildTrie, findWords, Word } from "./autocomplete";
+import { Word, buildTrie, findWords } from "./autocomplete";
+import { describe, expect, test } from "vitest";
 
 describe("Autocomplete", () => {
   const words: Word[] = ["code", "coder", "cocoa", "banana"];
