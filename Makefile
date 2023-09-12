@@ -41,6 +41,7 @@ run_webapp:
 # Recreate web app docker image
 rebuild_webapp:
 	docker compose down
+	docker image rm $(WEBAPP_NAME) || (echo "No $(WEBAPP_NAME) found, all good."; exit 0)
 	docker compose build $(WEBAPP_NAME)
 
 test_dev_webapp:
