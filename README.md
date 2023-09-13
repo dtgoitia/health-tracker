@@ -4,6 +4,20 @@
 make set-up-development-environment
 ```
 
+## Usage
+
+```shell
+# To spin up frontend and backend
+make run
+
+# To remove containers
+docker compose down
+```
+
+NOTE: requires having docker installed.
+
+See `Makefile` for more development related commands.
+
 ## Test CI pipeline
 
 Requires having [act][1] installed.
