@@ -81,3 +81,11 @@ export function toISOStringWithLocalTimezone(date: Date) {
     .format(date)
     .replace(/ GMT([+-])(.*)/, " $10$2:00");
 }
+
+export function isSameDay({ a, b }: { a: Date; b: Date }): boolean {
+  return (
+    a.getUTCFullYear() === b.getUTCFullYear() &&
+    a.getUTCMonth() === b.getUTCMonth() &&
+    a.getUTCDate() === b.getUTCDate()
+  );
+}

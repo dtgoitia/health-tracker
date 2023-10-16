@@ -1,4 +1,5 @@
 import IntensitySelector from "../../../components/IntensitySelector";
+import { isSameDay } from "../../../datetimeUtils";
 import {
   setMetricDate,
   setMetricIntensity,
@@ -79,11 +80,44 @@ function EditableRow({
   onToggleSelect,
 }: RowProps) {
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [date, setDate] = useState<Date>(metric.date);
 
   const time: string = formatTime(metric.date);
 
-  function handleDateChange(date: Date) {
+  function handleDateChange(date: Date | null): void {
+    setDate(date ? date : metric.date);
+  }
+
+  function clearUnsavedDateChanges() {
+    setDate(metric.date);
+  }
+
+  function closeDateDialog(): void {
+    setShowDatePicker(false);
+  }
+
+  function handleDateChangeSubmission(date: Date): void {
+    const message =
+      `DATE CHANGED\n` +
+      `\n` +
+      `Date changed from:\n` +
+      `${metric.date.toISOString()}\n` +
+      `to:\n` +
+      `${date.toISOString()}\n` +
+      `\n` +
+      `Do you want to save the changes?`;
+    if (isSameDay({ a: metric.date, b: date }) === false && confirm(message) === false) {
+      return;
+    }
+
+    // the user picked moved the Metric occurrence to a different date
     onChange(setMetricDate(metric, date));
+    closeDateDialog();
+  }
+
+  function handleDateDialogClosure(): void {
+    clearUnsavedDateChanges();
+    closeDateDialog();
   }
 
   function handleIntensityChange(intensity: Intensity): void {
@@ -93,6 +127,8 @@ function EditableRow({
   function handleNotesChange(notes: string): void {
     onChange(setMetricNotes(metric, notes));
   }
+
+  const dateChanged = metric.date.getTime() !== date.getTime();
 
   return (
     <Container>
@@ -104,11 +140,11 @@ function EditableRow({
         isCloseButtonShown={true}
         canEscapeKeyClose={true}
         transitionDuration={0}
-        onClose={() => setShowDatePicker(false)}
+        onClose={() => handleDateDialogClosure()}
       >
         <div className="bp4-dialog-body">
           <DatePicker
-            value={metric.date}
+            value={date}
             defaultValue={metric.date}
             timePrecision={TimePrecision.MINUTE}
             shortcuts={true}
@@ -117,7 +153,28 @@ function EditableRow({
             onChange={handleDateChange}
           />
         </div>
-        <div className="bp4-dialog-footer">Changes are saved automatically</div>
+        <div className="bp4-dialog-footer">
+          {dateChanged && (
+            <p>
+              previous date: <code>{metric.date.toISOString()}</code>
+            </p>
+          )}
+          <Button
+            icon="undo"
+            text="Discard changes"
+            minimal={false}
+            onClick={() => clearUnsavedDateChanges()}
+            disabled={dateChanged === false}
+          />
+          <Button
+            icon="floppy-disk"
+            text="Save"
+            intent="primary"
+            minimal={false}
+            onClick={() => handleDateChangeSubmission(date)}
+            disabled={dateChanged === false}
+          />
+        </div>
       </Dialog>
 
       <TopLine>
