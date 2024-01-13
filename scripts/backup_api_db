@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+#
+#   Copy remote SQLite DB to local
+#
+
+set -o nounset
+set -o pipefail
+set -o errexit
+
+info () {
+    message="[INFO] ${1}"
+    echo >&2 "${message}"
+}
+
+REMOTE_FILE_NAME='health-tracker-api-db.sqlite'
+
+file_name="$(date --iso)-${REMOTE_FILE_NAME}"
+vps_data_dir="/home/${VPS_USER}/k3s-data"
+
+info "downloading ${REMOTE_FILE_NAME}"
+scp "${VPS_HOSTNAME}@${VPS_USER}:${vps_data_dir}/${REMOTE_FILE_NAME}" "${file_name}"
+info "backup stored at $(realpath "${file_name}" )"

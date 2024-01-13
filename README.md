@@ -1,3 +1,9 @@
+## Backup
+
+```shell
+scripts/backup_api_db
+```
+
 ## Setup repo
 
 ```shell
