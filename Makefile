@@ -27,6 +27,25 @@ uninstall_dev_tools:
 	pre-commit uninstall  # pre-commit is (default)
 	pre-commit uninstall --hook-type pre-push
 
+remove_development_environment:
+	@echo ""
+	@echo Uninstalling git hooks...
+	make uninstall_dev_tools
+
+	@echo ""
+	@echo Uninstalling NPM dependencies outside of the container
+	rm -rf webapp/node_modules
+
+	@echo ""
+	@echo Deleting Rust development files
+	rm -rf api/target
+
+	@echo ""
+	@echo Removing docker containers and images
+	docker compose down
+	docker image rm $(WEBAPP_NAME) || (echo "No $(WEBAPP_NAME) found, all good."; exit 0)
+	docker image rm $(API_NAME) || (echo "No $(API_NAME) found, all good."; exit 0)
+
 
 #===============================================================================
 #
