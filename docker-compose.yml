@@ -20,15 +20,6 @@ services:
     # depends_on:
     #   - health-tracker-api
 
-  qr:
-    build:
-      context: ./qr
-      dockerfile: Dockerfile
-    image: qr
-    container_name: qr
-    volumes:
-      - ./qr:/app
-
   health-tracker-api:
     build:
       context: ./api
