@@ -40,10 +40,10 @@ function SymptomExplorer({ app }: Props) {
       <CenteredPage>
         <NavBar app={app} />
         <div>SymptomExplorer</div>
+        <AddSymptom add={handleAddSymptom} />
         {symptoms.map((symptom) => (
           <OpenSymptomEditor key={`${symptom.id}`} symptom={symptom} />
         ))}
-        <AddSymptom add={handleAddSymptom} />
       </CenteredPage>
     </BlueprintThemeProvider>
   );
