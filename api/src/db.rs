@@ -351,7 +351,7 @@ pub async fn create_metric(metric: Metric, pool: &DbPool) -> Result<(), DbError>
     {
         Ok(_) => Ok(()),
         Err(error) => {
-            error!("failed to create metric, reason: {error:?}");
+            error!("failed to create metric, reason: {error:?}\n{metric:?}");
             Err(DbError::FailedToCreateMetric(SEE_LOGS.to_string()))
         }
     }
