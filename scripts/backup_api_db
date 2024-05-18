@@ -14,8 +14,16 @@ info () {
 }
 
 REMOTE_FILE_NAME='health-tracker-api-db.sqlite'
+stem="$( echo "${REMOTE_FILE_NAME}" | sed -E 's/\.sqlite//g' )"
 
-file_name="$(date --iso)-${REMOTE_FILE_NAME}"
+timestamp="$( \
+    date --rfc-3339='seconds' --utc `# 2024-05-18 11:06:45+00:00` \
+    | sed -E 's/\+00:00//g' \
+    | sed -E 's/-//g' \
+    | sed -E 's/://g' \
+    | sed -E 's/ /-/g'
+)"
+file_name="${stem}-backup-${timestamp}.sqlite"
 vps_data_dir="/home/${VPS_USER}/k3s-data"
 
 info "downloading ${REMOTE_FILE_NAME}"
