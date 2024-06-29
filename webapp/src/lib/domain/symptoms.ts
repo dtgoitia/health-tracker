@@ -1,3 +1,4 @@
+import { AutocompleterV2, Word } from "../../autocomplete";
 import { now } from "../../datetimeUtils";
 import { unreachable } from "../devex";
 import { generateId } from "../hash";
@@ -34,9 +35,14 @@ export class SymptomManager {
 
   private changesSubject: Subject<SymptomChange>;
   private symptoms: Map<SymptomId, Symptom>;
+  private autocompleter: AutocompleterV2<Symptom>;
   private initialized: boolean;
 
   constructor() {
+    this.autocompleter = new AutocompleterV2<Symptom>({
+      itemToWordMapper: symptomToWords,
+    });
+
     this.changesSubject = new Subject<SymptomChange>();
     this.changes$ = this.changesSubject.asObservable();
 
@@ -53,6 +59,8 @@ export class SymptomManager {
       this.symptoms.set(symptom.id, symptom);
     }
 
+    this.autocompleter.initialize({ items: symptoms });
+
     this.initialized = true;
     this.changesSubject.next({ kind: "SymptomManagerInitialized" });
   }
@@ -66,32 +74,39 @@ export class SymptomManager {
       lastModified: now(),
     };
     this.symptoms.set(id, symptom);
+    this.autocompleter.addItem(symptom);
     this.changesSubject.next({ kind: "SymptomAdded", id });
   }
 
-  public update({ symptom }: UpdateSymptomArgs): Result<null, Error> {
-    const { id } = symptom;
-    if (this.symptoms.has(id) === false) {
+  public update({ symptom: updated }: UpdateSymptomArgs): Result<null, Error> {
+    const { id } = updated;
+    const previous = this.symptoms.get(id);
+    if (previous === undefined) {
       return Err({
         kind: "FailedToUpdateSymptom",
         reason: `SymptomManager.update::No symptom found with ID ${id}, nothing will be updated`,
       });
     }
 
-    this.symptoms.set(id, symptom);
+    this.symptoms.set(id, updated);
+
+    this.autocompleter.removeItem(previous);
+    this.autocompleter.addItem(updated);
 
     this.changesSubject.next({ kind: "SymptomUpdated", id });
     return Ok(null);
   }
 
   public delete({ id }: DeleteteSymptomArgs): void {
-    if (this.symptoms.has(id) === false) {
+    const previous = this.symptoms.get(id);
+    if (previous === undefined) {
       console.debug(
         `SymptomManager.delete::No symptom found with ID ${id}, nothing will be deleted`
       );
       return;
     }
 
+    this.autocompleter.removeItem(previous);
     this.symptoms.delete(id);
     this.changesSubject.next({ kind: "SymptomDeleted", id });
   }
@@ -129,6 +144,19 @@ export class SymptomManager {
       this.symptoms.set(symptom.id, symptom);
     }
     this.changesSubject.next({ kind: "SymptomsAddedFromExternalSource" });
+  }
+
+  /**
+   * Find symptoms that cointain words starting with the provided query
+   */
+  public searchByPrefix(query: string): Symptom[] {
+    const prefixes = query.split(" ").filter((prefix) => !!prefix);
+
+    if (prefixes.length === 0) return this.getAll();
+
+    const unsortedResults = this.autocompleter.search(prefixes.join(" "));
+
+    return [...unsortedResults].sort(sortSymptomsAlphabetically);
   }
 
   private generateSymptomId() {
@@ -209,4 +237,15 @@ export function indexSymptoms(symptoms: Symptom[]): Map<SymptomId, Symptom> {
     map.set(symptom.id, symptom);
   });
   return map;
+}
+
+export function symptomToWords(symptom: Symptom): Set<Word> {
+  const symptomWords = [symptom.name, ...(symptom.otherNames || [])]
+    .filter((name) => name)
+    .map((name) => name.toLowerCase())
+    .map((name) => name.split(" "))
+    .flat();
+
+  const words = new Set(symptomWords);
+  return words;
 }

@@ -3,7 +3,6 @@ import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
 import { now, yesterday } from "../../datetimeUtils";
 import { HealthTracker } from "../../lib/app/app";
-import { filterSymptoms } from "../../lib/app/symptoms";
 import {
   FilterQuery,
   Intensity,
@@ -100,7 +99,7 @@ export function RecordMetricPage({ app }: Props) {
           onFocus={() => setUserIsSearching(true)}
         />
         <InventoryView
-          symptoms={filterSymptoms(symptoms, filterQuery)}
+          symptoms={app.symptomManager.searchByPrefix(filterQuery)}
           selectSymptom={handleSelectSymptom}
           collapse={!userIsSearching}
         />

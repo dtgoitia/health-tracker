@@ -5,7 +5,6 @@ import NavBar from "../../components/NavBar";
 import { now } from "../../datetimeUtils";
 import { HealthTracker } from "../../lib/app/app";
 import { filterMetrics } from "../../lib/app/metrics";
-import { filterSymptoms } from "../../lib/app/symptoms";
 import {
   FilterQuery,
   Intensity,
@@ -89,7 +88,7 @@ function HistoryPage({ app }: Props) {
     setUserIsSearching(false);
   };
 
-  const filteredSymptoms = filterSymptoms(symptoms, filterQuery);
+  const filteredSymptoms = app.symptomManager.searchByPrefix(filterQuery);
 
   return (
     <BlueprintThemeProvider>
