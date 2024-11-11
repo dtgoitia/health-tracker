@@ -275,7 +275,7 @@ impl Endpoints {
             Err(_) => unreachable!(),
         };
 
-        info!("symptom created: {id}");
+        info!("metric created: {id}");
 
         CreateMetricResponse::Success(Json(CreateMetricResponseBody {
             created_metric: metric.into(),
