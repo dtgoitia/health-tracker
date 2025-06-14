@@ -1,3 +1,8 @@
+import NumericIntensitySelector, {
+  numberIntensityToIntensity,
+  NumericIntensity,
+  parseNotes,
+} from "../../components/NumericIntensitySelector";
 import { Symptom, SymptomId, Intensity, Notes } from "../../lib/domain/model";
 import { findSymptomById } from "../../lib/domain/symptoms";
 import { Button } from "@blueprintjs/core";
@@ -10,6 +15,8 @@ const ButtonsLabel = styled.label`
 const ButtonRibbon = styled.div`
   margin: 1rem 0;
 `;
+
+type IntensityNumber = number;
 
 interface AddMetricProps {
   symptoms: Symptom[];
@@ -36,6 +43,18 @@ function AddMetric({ symptoms, selectedSymptomId, record }: AddMetricProps) {
     setNotes(event.target.value);
   }
 
+  function handleNumericIntensityChange(nIntensity: NumericIntensity): void {
+    const { notes: trimmedNotes } = parseNotes(notes);
+    const intensity = numberIntensityToIntensity(nIntensity);
+    let updatedNotes = `${nIntensity}/10`;
+    if (trimmedNotes) {
+      updatedNotes += ` - ${trimmedNotes}`;
+    }
+
+    setIntensity(intensity);
+    setNotes(updatedNotes);
+  }
+
   const intensityButtons = Object.keys(Intensity).map((key) => {
     const buttonIntensity = key as Intensity;
     const classNameIfSelected = buttonIntensity === intensity ? "bp4-intent-success" : "";
@@ -44,7 +63,10 @@ function AddMetric({ symptoms, selectedSymptomId, record }: AddMetricProps) {
         key={key}
         type="button"
         className={`bp4-button bp4-large ${classNameIfSelected}`}
-        onClick={() => setIntensity(buttonIntensity)}
+        onClick={() => {
+          setIntensity(buttonIntensity);
+          setNotes("");
+        }}
       >
         {buttonIntensity}
       </button>
@@ -66,6 +88,10 @@ function AddMetric({ symptoms, selectedSymptomId, record }: AddMetricProps) {
         <ButtonsLabel>intensity</ButtonsLabel>
         <div className="bp4-button-group .modifier">{intensityButtons}</div>
       </ButtonRibbon>
+      <NumericIntensitySelector
+        selected={parseNotes(notes).nIntensity}
+        onSelect={handleNumericIntensityChange}
+      />
       <input
         id="form-group-input"
         type="text"

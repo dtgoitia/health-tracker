@@ -1,4 +1,9 @@
 import IntensitySelector from "../../../components/IntensitySelector";
+import NumericIntensitySelector, {
+  numberIntensityToIntensity,
+  NumericIntensity,
+  parseNotes,
+} from "../../../components/NumericIntensitySelector";
 import { isSameDay } from "../../../datetimeUtils";
 import {
   setMetricDate,
@@ -38,7 +43,7 @@ const DeleteMetric = styled.div`
   flex-grow: 0;
   align-self: center;
 `;
-const Notes = styled.div`
+const NotesElement = styled.div`
   align-self: center;
   padding-left: ${selectWidth + editWidth}rem;
   font-size: 0.8rem;
@@ -124,6 +129,19 @@ function EditableRow({
     onChange(setMetricIntensity(metric, intensity));
   }
 
+  function handleNumericIntensityChange(nIntensity: NumericIntensity): void {
+    const { notes: trimmedNotes } = parseNotes(metric.notes);
+    const intensity = numberIntensityToIntensity(nIntensity);
+    let notes = `${nIntensity}/10`;
+    if (trimmedNotes) {
+      notes += ` - ${trimmedNotes}`;
+    }
+
+    let updated = setMetricIntensity(metric, intensity);
+    updated = setMetricNotes(metric, notes);
+    onChange(updated);
+  }
+
   function handleNotesChange(notes: string): void {
     onChange(setMetricNotes(metric, notes));
   }
@@ -202,15 +220,19 @@ function EditableRow({
       </TopLine>
 
       <BottomLine>
-        <Notes>
+        <NotesElement>
           <EditableText
             multiline={false}
             placeholder={`observations...`}
             value={metric.notes}
             onChange={handleNotesChange}
           />
-        </Notes>
+        </NotesElement>
       </BottomLine>
+      <NumericIntensitySelector
+        selected={parseNotes(metric.notes).nIntensity}
+        onSelect={handleNumericIntensityChange}
+      />
     </Container>
   );
 }
