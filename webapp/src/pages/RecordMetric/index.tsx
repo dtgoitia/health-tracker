@@ -1,7 +1,7 @@
 import ReloadPage from "../../ReloadPage";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
-import { now, yesterday } from "../../datetimeUtils";
+import { nDaysAgo, now } from "../../datetimeUtils";
 import { HealthTracker } from "../../lib/app/app";
 import {
   FilterQuery,
@@ -36,14 +36,14 @@ export function RecordMetricPage({ app }: Props) {
     });
     const metricSubscription = app.metricManager.changes$.subscribe((_) => {
       const fullHistory = app.metricManager.getAll();
-      const todayOrLater = keepTodayOrAfter(fullHistory);
+      const todayOrLater = keepRecentMetrics(fullHistory);
       setMetrics(todayOrLater);
     });
 
     setSymptoms(app.symptomManager.getAll());
 
     const fullHistory = app.metricManager.getAll();
-    const todayOrLater = keepTodayOrAfter(fullHistory);
+    const todayOrLater = keepRecentMetrics(fullHistory);
     setMetrics(todayOrLater);
 
     return () => {
@@ -122,12 +122,8 @@ export function RecordMetricPage({ app }: Props) {
   );
 }
 
-function keepTodayOrAfter(all: Metric[]): Metric[] {
-  const t = yesterday().getTime();
+function keepRecentMetrics(all: Metric[]): Metric[] {
+  const t = nDaysAgo({ n: 2 }).getTime();
 
-  function isYesterdayOrAfter(date: Date): boolean {
-    return t < date.getTime();
-  }
-
-  return all.filter((record) => isYesterdayOrAfter(record.date));
+  return all.filter((record) => t < record.date.getTime());
 }

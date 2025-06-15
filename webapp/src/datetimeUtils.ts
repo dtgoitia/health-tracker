@@ -14,19 +14,19 @@ function today(): Date {
   return toDay(now());
 }
 
-export function yesterday(): Date {
-  const _today = toDay(now()).getTime();
+function yesterday(): Date {
+  const todayMidnight = toDay(now()).getTime();
   const oneDay = 24 * 60 * 60 * 1000;
-  return new Date(_today - oneDay);
+  return new Date(todayMidnight - oneDay);
 }
 
-function n_days({ n }: { n: DayAmount }): Milliseconds {
+function nDays({ n }: { n: DayAmount }): Milliseconds {
   return n * 1000 * 60 * 60 * 24;
 }
 
-export function n_days_ago({ n }: { n: DayAmount }): Date {
-  const _today = datetimeToMs(today());
-  return new Date(_today - n_days({ n }));
+export function nDaysAgo({ n }: { n: DayAmount }): Date {
+  const todayLocalMidnight = toDay(now()).getTime();
+  return new Date(todayLocalMidnight - nDays({ n }));
 }
 
 export function getDay(date: Date): Date {
@@ -48,7 +48,7 @@ export function getLastNDates({ n }: { n: DayAmount }): Date[] {
   const result: Date[] = [today()];
 
   for (let date_diff = 1; date_diff < n; date_diff++) {
-    const date = n_days_ago({ n: date_diff });
+    const date = nDaysAgo({ n: date_diff });
     result.push(date);
   }
 
