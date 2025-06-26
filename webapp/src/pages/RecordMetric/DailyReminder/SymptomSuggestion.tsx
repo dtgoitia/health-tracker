@@ -19,7 +19,6 @@ function SymptomSuggestion({
   alreadyRecordedToday,
 }: Props) {
   const [name, setName] = useState<SymptomName | undefined>(undefined);
-  const [intensity, setIntensity] = useState<Intensity>(Intensity.medium);
 
   useEffect(() => {
     function setSymptomState(): void {
@@ -39,7 +38,7 @@ function SymptomSuggestion({
   }, [symptomManager]);
 
   function handleClone(): void {
-    addMetric(pastMetric.symptomId, intensity, pastMetric.notes);
+    addMetric(pastMetric.symptomId, Intensity.medium, pastMetric.notes);
   }
 
   return (
@@ -49,7 +48,6 @@ function SymptomSuggestion({
       }}
     >
       <Name>{name}</Name>
-      <IntensitySelector selectedIntensity={intensity} onSelect={setIntensity} />
       <Button text="Clone" large onClick={handleClone} />
     </Container>
   );
@@ -59,7 +57,11 @@ export default SymptomSuggestion;
 
 const Container = styled.div`
   display: flex;
+  flex-flow: row no-wrap;
+  justify-content: space-between;
+  margin: 0.5rem 0;
 `;
 const Name = styled.div`
   align-self: center;
+  flex-basis: auto;
 `;
