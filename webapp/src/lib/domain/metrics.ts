@@ -86,6 +86,7 @@ export class MetricManager {
       lastModified: now(),
     };
     this.metrics.set(id, metric);
+    this.addMetricToDateIndex(metric);
     this.changesSubject.next({ kind: "MetricAdded", id });
   }
 
