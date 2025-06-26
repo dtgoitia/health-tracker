@@ -82,10 +82,14 @@ export function toISOStringWithLocalTimezone(date: Date) {
     .replace(/ GMT([+-])(.*)/, " $10$2:00");
 }
 
+/**
+ * Returns `true` if both dates have the same date in the local time of the device.
+ */
 export function isSameDay({ a, b }: { a: Date; b: Date }): boolean {
   return (
-    a.getUTCFullYear() === b.getUTCFullYear() &&
-    a.getUTCMonth() === b.getUTCMonth() &&
-    a.getUTCDate() === b.getUTCDate()
+    // make sure to use local time
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
   );
 }
