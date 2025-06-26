@@ -171,7 +171,7 @@ export class SymptomManager {
   }
 }
 
-export function sortSymptomsAlphabetically(a: Symptom, b: Symptom): SortAction {
+function sortSymptomsAlphabetically(a: Symptom, b: Symptom): SortAction {
   const name_a = a.name.toLowerCase();
   const name_b = b.name.toLowerCase();
   switch (true) {
