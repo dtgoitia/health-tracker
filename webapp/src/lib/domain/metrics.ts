@@ -175,12 +175,12 @@ export class MetricManager {
 
   public getMetricsOfLastNDays({ n }: { n: DayAmount }): Metric[] {
     const desiredDates = getLastNDates({ n });
-    const ids = new Set<MetricId>();
+    const ids: MetricId[] = [];
     for (const date of desiredDates) {
       const dateInMs = datetimeToMs(date);
       const idsInDate = this.metricsByDate.get(dateInMs) || new Set<MetricId>();
       for (const id of idsInDate) {
-        ids.add(id);
+        ids.push(id);
       }
     }
 
