@@ -127,14 +127,15 @@ export class MetricManager {
   }
 
   public delete({ id }: DeleteteMetricArgs): void {
-    if (this.metrics.has(id) === false) {
+    const previous = this.metrics.get(id);
+    if (previous === undefined) {
       console.debug(
         `${MetricManager.name}.delete::No metric found with ID ${id}, nothing` +
           ` will be deleted`
       );
       return;
     }
-
+    this.removeMetricFromDateIndex(previous);
     this.metrics.delete(id);
     this.changesSubject.next({ kind: "MetricDeleted", id });
   }
