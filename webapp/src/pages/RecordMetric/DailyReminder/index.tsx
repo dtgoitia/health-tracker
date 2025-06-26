@@ -64,6 +64,14 @@ function DailyReminder({ symptomManager, metricManager }: Props) {
             <p>No metrics yesterday, no suggestions today :)</p>
           )}
         </Card>
+        <Button
+          icon="cross"
+          intent="none"
+          text="Close"
+          onClick={() => setIsOpen(false)}
+          fill
+          large
+        />
       </Collapse>
     </Container>
   );
