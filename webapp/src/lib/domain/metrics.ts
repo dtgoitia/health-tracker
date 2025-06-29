@@ -34,7 +34,7 @@ interface UpdateMetricArgs {
   metric: Metric;
 }
 
-interface DeleteteMetricArgs {
+interface DeleteMetricArgs {
   id: MetricId;
 }
 
@@ -132,7 +132,7 @@ export class MetricManager {
     this.metricsByDate.set(day, metricsInSameDay);
   }
 
-  public delete({ id }: DeleteteMetricArgs): void {
+  public delete({ id }: DeleteMetricArgs): void {
     const previous = this.metrics.get(id);
     if (previous === undefined) {
       console.debug(

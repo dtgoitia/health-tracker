@@ -352,7 +352,7 @@ export class RemoteStorage {
   }
 
   /**
-   * Returs a date at point in time slighly earlier than the last pulled date.
+   * Returns a date at point in time slightly earlier than the last pulled date.
    */
   private getLastPullDate(): Date {
     const date = this.settingsManager.settings.lastPulledAt;

@@ -22,7 +22,7 @@ interface UpdateSymptomArgs {
   symptom: Symptom;
 }
 
-interface DeleteteSymptomArgs {
+interface DeleteSymptomArgs {
   id: SymptomId;
 }
 
@@ -97,7 +97,7 @@ export class SymptomManager {
     return Ok(null);
   }
 
-  public delete({ id }: DeleteteSymptomArgs): void {
+  public delete({ id }: DeleteSymptomArgs): void {
     const previous = this.symptoms.get(id);
     if (previous === undefined) {
       console.debug(
@@ -147,7 +147,7 @@ export class SymptomManager {
   }
 
   /**
-   * Find symptoms that cointain words starting with the provided query
+   * Find symptoms that contain words starting with the provided query
    */
   public searchByPrefix(query: string): Symptom[] {
     const prefixes = query.split(" ").filter((prefix) => !!prefix);
