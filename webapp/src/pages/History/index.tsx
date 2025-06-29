@@ -3,8 +3,8 @@ import ReloadPage from "../../ReloadPage";
 import AddSymptom from "../../components/AddSymptom";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
-import { now } from "../../datetimeUtils";
 import { filterMetrics } from "../../lib/app/metrics";
+import { now } from "../../lib/datetimeUtils";
 import {
   FilterQuery,
   Intensity,

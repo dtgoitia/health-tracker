@@ -1,5 +1,5 @@
+import { formatTime } from "../../../lib/datetimeUtils";
 import { Metric, Symptom } from "../../../lib/domain/model";
-import { formatTime } from "./datetime";
 import styled from "styled-components";
 
 const Col1 = styled.div`

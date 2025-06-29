@@ -1,4 +1,4 @@
-import { now } from "../../datetimeUtils";
+import { now } from "../../lib/datetimeUtils";
 import { Metric, Symptom } from "../../lib/domain/model";
 import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";

@@ -2,7 +2,7 @@ import { useApp } from "../..";
 import CenteredPage from "../../components/CenteredPage";
 import { DeleteConfirmationDialog } from "../../components/DeleteConfirmationDialog";
 import NavBar from "../../components/NavBar";
-import { now } from "../../datetimeUtils";
+import { now } from "../../lib/datetimeUtils";
 import { Symptom, SymptomId, SymptomName } from "../../lib/domain/model";
 import {
   setSymptomName,

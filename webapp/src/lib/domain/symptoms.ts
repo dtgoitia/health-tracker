@@ -1,5 +1,5 @@
 import { AutocompleterV2, Word } from "../../autocomplete";
-import { now } from "../../datetimeUtils";
+import { now } from "../datetimeUtils";
 import { unreachable } from "../devex";
 import { generateId } from "../hash";
 import { SortAction } from "../sort";

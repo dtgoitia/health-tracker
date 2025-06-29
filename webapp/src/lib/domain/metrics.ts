@@ -1,12 +1,12 @@
 import {
-  DayAmount,
-  Milliseconds,
+  datesAreEqual,
   datetimeToMs,
+  DayAmount,
   getDay,
   getLastNDates,
+  Milliseconds,
   now,
-} from "../../datetimeUtils";
-import { datesAreEqual } from "../datetimeUtils";
+} from "../datetimeUtils";
 import { unreachable } from "../devex";
 import { generateId } from "../hash";
 import { SortAction } from "../sort";

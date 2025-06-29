@@ -1,6 +1,6 @@
 import { PULL_OVERLAP_SECONDS, REMOTE_LOOP_WAIT } from "../../config";
-import { now } from "../../datetimeUtils";
 import { assertNever } from "../../exhaustive-match";
+import { now } from "../datetimeUtils";
 import { MetricManager } from "../domain/metrics";
 import { ErrorReason, Metric, MetricId, Symptom, SymptomId } from "../domain/model";
 import { SettingsManager } from "../domain/settings";

@@ -1,4 +1,4 @@
-import { isSameDay, now } from "../../../datetimeUtils";
+import { isSameDay, now } from "../../../lib/datetimeUtils";
 import { unreachable } from "../../../lib/devex";
 import { MetricManager } from "../../../lib/domain/metrics";
 import { Intensity, Metric, SymptomId } from "../../../lib/domain/model";

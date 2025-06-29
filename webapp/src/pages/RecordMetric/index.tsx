@@ -2,7 +2,7 @@ import { useApp } from "../..";
 import ReloadPage from "../../ReloadPage";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
-import { nDaysAgo, now } from "../../datetimeUtils";
+import { nDaysAgo, now } from "../../lib/datetimeUtils";
 import {
   FilterQuery,
   Intensity,

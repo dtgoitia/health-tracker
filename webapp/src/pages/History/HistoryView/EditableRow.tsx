@@ -1,6 +1,6 @@
 import IntensitySelector from "../../../components/IntensitySelector";
 import NumericIntensitySelector from "../../../components/NumericIntensitySelector";
-import { isSameDay } from "../../../datetimeUtils";
+import { formatTime, isSameDay } from "../../../lib/datetimeUtils";
 import {
   NumericIntensity,
   parseNotes,
@@ -10,7 +10,6 @@ import {
   setMetricNumericIntensity,
 } from "../../../lib/domain/metrics";
 import { Metric, Symptom, Intensity } from "../../../lib/domain/model";
-import { formatTime } from "./datetime";
 import { Button, Dialog, EditableText } from "@blueprintjs/core";
 import { TimePrecision, DatePicker } from "@blueprintjs/datetime";
 import { useState } from "react";
