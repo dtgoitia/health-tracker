@@ -1,16 +1,12 @@
-import { Intensity, Notes } from "../lib/domain/model";
+import { NumericIntensity, POSSIBLE_NUMERIC_INTENSITIES } from "../lib/domain/metrics";
 import styled from "styled-components";
-
-export type NumericIntensity = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 interface Props {
   selected: NumericIntensity | undefined;
   onSelect: (label: NumericIntensity) => void;
 }
 function NumericIntensitySelector({ selected, onSelect }: Props) {
-  const options: NumericIntensity[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-  const buttons = [...options].map((nIntensity) => {
+  const buttons = [...POSSIBLE_NUMERIC_INTENSITIES].map((nIntensity) => {
     const classNameIfSelected = nIntensity === selected ? "bp4-intent-success" : "";
 
     return (
@@ -44,53 +40,3 @@ const Container = styled.div`
   align-self: center;
   padding: 1rem 0;
 `;
-
-export function numberIntensityToIntensity(n: NumericIntensity): Intensity {
-  return {
-    1: Intensity.low,
-    2: Intensity.low,
-    3: Intensity.low,
-    4: Intensity.medium,
-    5: Intensity.medium,
-    6: Intensity.medium,
-    7: Intensity.high,
-    8: Intensity.high,
-    9: Intensity.high,
-    10: Intensity.high,
-  }[n];
-}
-
-const NOTE_WITH_NUMERIC_INTENSITY = /^(?<nIntensity>[1-9]|10)\/10\s?-?\s?(?<notes>.*)/;
-
-interface ParsedNote {
-  nIntensity: NumericIntensity | undefined;
-  notes: Notes;
-}
-
-/**
- * Parse a `Metric.note` and extract the numeric intensity and the remainder
- * of the note.
- *
- * Example: the following input
- *
- * ```text
- * 1/10 - something cool
- * ```
- *
- * returns
- *
- * ```text
- * { nIntensity: NumericIntensity; notes: string }
- * ```
- *
- */
-export function parseNotes(notes: Notes): ParsedNote {
-  const result = NOTE_WITH_NUMERIC_INTENSITY.exec(notes);
-  if (!result?.groups) {
-    return { nIntensity: undefined, notes };
-  }
-
-  const nIntensity = Number(result.groups["nIntensity"]) as NumericIntensity;
-  const trimmed = result.groups["notes"];
-  return { nIntensity, notes: trimmed };
-}

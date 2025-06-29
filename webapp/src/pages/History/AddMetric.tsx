@@ -1,8 +1,9 @@
-import NumericIntensitySelector, {
-  numberIntensityToIntensity,
+import NumericIntensitySelector from "../../components/NumericIntensitySelector";
+import {
   NumericIntensity,
   parseNotes,
-} from "../../components/NumericIntensitySelector";
+  recomputeMetricNumericIntensity,
+} from "../../lib/domain/metrics";
 import { Symptom, SymptomId, Intensity, Notes } from "../../lib/domain/model";
 import { findSymptomById } from "../../lib/domain/symptoms";
 import { Button } from "@blueprintjs/core";
@@ -42,13 +43,10 @@ function AddMetric({ symptoms, selectedSymptomId, record }: AddMetricProps) {
   }
 
   function handleNumericIntensityChange(nIntensity: NumericIntensity): void {
-    const { notes: trimmedNotes } = parseNotes(notes);
-    const intensity = numberIntensityToIntensity(nIntensity);
-    let updatedNotes = `${nIntensity}/10`;
-    if (trimmedNotes) {
-      updatedNotes += ` - ${trimmedNotes}`;
-    }
-
+    const { intensity, updatedNotes } = recomputeMetricNumericIntensity({
+      nIntensity,
+      notes,
+    });
     setIntensity(intensity);
     setNotes(updatedNotes);
   }

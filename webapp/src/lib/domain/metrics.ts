@@ -41,6 +41,11 @@ type Error =
   | { kind: "InitializationFailed" }
   | { kind: "FailedToUpdateMetric"; reason: ErrorReason };
 
+export type NumericIntensity = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export const POSSIBLE_NUMERIC_INTENSITIES: NumericIntensity[] = [
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+];
+
 export class MetricManager {
   public changes$: Observable<MetricChange>;
 
@@ -261,6 +266,88 @@ export function setMetricIntensity(metric: Metric, intensity: Intensity): Metric
 
 export function setMetricNotes(metric: Metric, notes: Notes): Metric {
   return { ...metric, notes, lastModified: new Date() };
+}
+
+export function numberIntensityToIntensity(n: NumericIntensity): Intensity {
+  return {
+    0: Intensity.low,
+    1: Intensity.low,
+    2: Intensity.low,
+    3: Intensity.low,
+    4: Intensity.medium,
+    5: Intensity.medium,
+    6: Intensity.medium,
+    7: Intensity.high,
+    8: Intensity.high,
+    9: Intensity.high,
+    10: Intensity.high,
+  }[n];
+}
+
+const NOTE_WITH_NUMERIC_INTENSITY = /^(?<nIntensity>[0-9]|10)\/10\s?-?\s?(?<notes>.*)/;
+
+interface ParsedNote {
+  nIntensity: NumericIntensity | undefined;
+  notes: Notes;
+}
+
+/**
+ * Parse a `Metric.note` and extract the numeric intensity and the remainder
+ * of the note.
+ *
+ * Example: the following input
+ *
+ * ```text
+ * 1/10 - something cool
+ * ```
+ *
+ * returns
+ *
+ * ```text
+ * { nIntensity: NumericIntensity; notes: string }
+ * ```
+ *
+ */
+export function parseNotes(notes: Notes): ParsedNote {
+  const result = NOTE_WITH_NUMERIC_INTENSITY.exec(notes);
+  if (!result?.groups) {
+    return { nIntensity: undefined, notes };
+  }
+
+  const nIntensity = Number(result.groups["nIntensity"]) as NumericIntensity;
+  const trimmed = result.groups["notes"];
+  return { nIntensity, notes: trimmed };
+}
+
+export function recomputeMetricNumericIntensity({
+  nIntensity,
+  notes,
+}: {
+  nIntensity: NumericIntensity;
+  notes: Notes;
+}): { intensity: Intensity; updatedNotes: Notes } {
+  const { notes: trimmedNotes } = parseNotes(notes);
+  const intensity = numberIntensityToIntensity(nIntensity);
+  let updatedNotes = `${nIntensity}/10`;
+  if (trimmedNotes) {
+    updatedNotes += ` - ${trimmedNotes}`;
+  }
+
+  return { intensity, updatedNotes };
+}
+
+export function setMetricNumericIntensity(
+  metric: Metric,
+  nIntensity: NumericIntensity
+): Metric {
+  const { intensity, updatedNotes } = recomputeMetricNumericIntensity({
+    nIntensity,
+    notes: metric.notes,
+  });
+
+  let updatedMetric = setMetricIntensity(metric, intensity);
+  updatedMetric = setMetricNotes(updatedMetric, updatedNotes);
+  return updatedMetric;
 }
 
 export function getIntensityLevelShorthand(intensity: Intensity): string {

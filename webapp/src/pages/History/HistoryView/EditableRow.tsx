@@ -1,14 +1,13 @@
 import IntensitySelector from "../../../components/IntensitySelector";
-import NumericIntensitySelector, {
-  numberIntensityToIntensity,
-  NumericIntensity,
-  parseNotes,
-} from "../../../components/NumericIntensitySelector";
+import NumericIntensitySelector from "../../../components/NumericIntensitySelector";
 import { isSameDay } from "../../../datetimeUtils";
 import {
+  NumericIntensity,
+  parseNotes,
   setMetricDate,
   setMetricIntensity,
   setMetricNotes,
+  setMetricNumericIntensity,
 } from "../../../lib/domain/metrics";
 import { Metric, Symptom, Intensity } from "../../../lib/domain/model";
 import { formatTime } from "./datetime";
@@ -130,16 +129,7 @@ function EditableRow({
   }
 
   function handleNumericIntensityChange(nIntensity: NumericIntensity): void {
-    const { notes: trimmedNotes } = parseNotes(metric.notes);
-    const intensity = numberIntensityToIntensity(nIntensity);
-    let notes = `${nIntensity}/10`;
-    if (trimmedNotes) {
-      notes += ` - ${trimmedNotes}`;
-    }
-
-    let updated = setMetricIntensity(metric, intensity);
-    updated = setMetricNotes(metric, notes);
-    onChange(updated);
+    onChange(setMetricNumericIntensity(metric, nIntensity));
   }
 
   function handleNotesChange(notes: string): void {
