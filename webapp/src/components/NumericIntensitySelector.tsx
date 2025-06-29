@@ -1,14 +1,14 @@
 import { Intensity, Notes } from "../lib/domain/model";
 import styled from "styled-components";
 
-export type NumericIntensity = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export type NumericIntensity = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 interface Props {
   selected: NumericIntensity | undefined;
   onSelect: (label: NumericIntensity) => void;
 }
 function NumericIntensitySelector({ selected, onSelect }: Props) {
-  const options: NumericIntensity[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const options: NumericIntensity[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   const buttons = [...options].map((nIntensity) => {
     const classNameIfSelected = nIntensity === selected ? "bp4-intent-success" : "";
