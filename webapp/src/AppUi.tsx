@@ -19,7 +19,7 @@ function AppUi() {
   return (
     <Routes>
       <Route path={Paths.root} element={<RecordMetricPage />} />
-      <Route path={Paths.history} element={<HistoryPage />} />
+      <Route path={Paths.metrics} element={<HistoryPage />} />
       <Route path={Paths.symptoms} element={<SymptomExplorer />} />
       <Route path={Paths.symptomsEditor} element={<SymptomEditor />} />
       <Route path={Paths.settings} element={<SettingsPage />} />

@@ -46,7 +46,7 @@ function NavBar() {
     <Container>
       <ButtonsContainer>
         <NavBarButton text="Home" path={Paths.root} />
-        <NavBarButton text="History" path={Paths.history} />
+        <NavBarButton text="History" path={Paths.metrics} />
         <NavBarButton text="Symptoms" path={Paths.symptoms} />
         <NavBarButton text="Settings" path={Paths.settings} />
       </ButtonsContainer>

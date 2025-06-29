@@ -4,7 +4,7 @@
  */
 enum Paths {
   root = "/",
-  history = "/history",
+  metrics = "/metrics",
   symptoms = "/symptoms",
   symptomsEditor = "/symptoms/:symptomId",
   settings = "/settings",
