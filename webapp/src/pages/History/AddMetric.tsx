@@ -16,8 +16,6 @@ const ButtonRibbon = styled.div`
   margin: 1rem 0;
 `;
 
-type IntensityNumber = number;
-
 interface AddMetricProps {
   symptoms: Symptom[];
   selectedSymptomId?: SymptomId;
@@ -82,25 +80,33 @@ function AddMetric({ symptoms, selectedSymptomId, record }: AddMetricProps) {
 
   return (
     <form onSubmit={canSubmit ? handleSubmit : () => {}}>
-      <p>Add a new metric:</p>
-      <div>{selectedSymptom?.name}</div>
-      <ButtonRibbon>
-        <ButtonsLabel>intensity</ButtonsLabel>
-        <div className="bp4-button-group .modifier">{intensityButtons}</div>
-      </ButtonRibbon>
-      <NumericIntensitySelector
-        selected={parseNotes(notes).nIntensity}
-        onSelect={handleNumericIntensityChange}
-      />
-      <input
-        id="form-group-input"
-        type="text"
-        className="bp4-input"
-        value={notes}
-        placeholder="add observations here..."
-        onChange={handleNotesChange}
-      />
-      <Button disabled={!canSubmit} intent="success" text="Add" type="submit" />
+      {selectedSymptom && (
+        <>
+          <h3 style={{ display: "flex", justifyContent: "center", paddingTop: "0.7rem" }}>
+            {selectedSymptom?.name}
+          </h3>
+          <ButtonRibbon>
+            <ButtonsLabel>intensity</ButtonsLabel>
+            <div className="bp4-button-group .modifier">{intensityButtons}</div>
+          </ButtonRibbon>
+          <NumericIntensitySelector
+            selected={parseNotes(notes).nIntensity}
+            onSelect={handleNumericIntensityChange}
+          />
+          <input
+            id="form-group-input"
+            type="text"
+            className="bp4-input"
+            value={notes}
+            placeholder="add observations here..."
+            onChange={handleNotesChange}
+          />
+          <Button disabled={!canSubmit} intent="success" text="Add" type="submit" />
+          <div style={{ display: "flex", justifyContent: "end", marginTop: "1rem" }}>
+            <Button intent="danger" text="Clear" />
+          </div>
+        </>
+      )}
     </form>
   );
 }
