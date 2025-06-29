@@ -6,13 +6,13 @@ import { MetricManager } from "../domain/metrics";
 import { SettingsManager } from "../domain/settings";
 import { SymptomManager } from "../domain/symptoms";
 import { ErrorManager } from "../errors";
-import { HealthTracker } from "./app";
+import { App } from "./app";
 
 /**
  * Instantiate app and set up their dependencies. Initialization logic does not
  * happen here. Instead it's sent
  */
-export function setUpApp(): HealthTracker {
+export function setUpApp(): App {
   const settingsManager = new SettingsManager();
   const storage = new LocalStorage();
   const symptomManager = new SymptomManager();
@@ -33,7 +33,7 @@ export function setUpApp(): HealthTracker {
     metricManager,
   });
 
-  const app = new HealthTracker({
+  const app = new App({
     settingsManager,
     symptomManager,
     metricManager,

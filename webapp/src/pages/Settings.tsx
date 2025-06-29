@@ -1,8 +1,8 @@
+import { useApp } from "..";
 import CenteredPage from "../components/CenteredPage";
 import NavBar from "../components/NavBar";
 import { toISOStringWithLocalTimezone } from "../datetimeUtils";
 import { assertNever } from "../exhaustive-match";
-import { HealthTracker } from "../lib/app/app";
 import BlueprintThemeProvider from "../style/theme";
 import { Button, Card, IconName } from "@blueprintjs/core";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -14,11 +14,9 @@ enum PushingAllStatus {
   failed = "failed",
 }
 
-interface Props {
-  app: HealthTracker;
-}
+function SettingsPage() {
+  const app = useApp();
 
-function SettingsPage({ app }: Props) {
   const [apiUrl, setApiUrl] = useState<string>("");
   const [apiToken, setApiToken] = useState<string>("");
   const [pushAllStatus, setPushingAllStatue] = useState(PushingAllStatus.none);
@@ -85,7 +83,7 @@ function SettingsPage({ app }: Props) {
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
-        <NavBar app={app} />
+        <NavBar />
         <h2>Settings</h2>
         <Card>
           <label>API URL</label>

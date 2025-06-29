@@ -1,9 +1,9 @@
+import { useApp } from "../..";
 import ReloadPage from "../../ReloadPage";
 import AddSymptom from "../../components/AddSymptom";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
 import { now } from "../../datetimeUtils";
-import { HealthTracker } from "../../lib/app/app";
 import { filterMetrics } from "../../lib/app/metrics";
 import {
   FilterQuery,
@@ -24,11 +24,9 @@ import InventoryView from "./Inventory";
 import SearchBox from "./SearchBox";
 import { useEffect, useState } from "react";
 
-interface Props {
-  app: HealthTracker;
-}
+function HistoryPage() {
+  const app = useApp();
 
-function HistoryPage({ app }: Props) {
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [selected, setSelected] = useState<SymptomId | undefined>();
   const [metrics, setMetrics] = useState<Metric[]>([]);
@@ -93,7 +91,7 @@ function HistoryPage({ app }: Props) {
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
-        <NavBar app={app} />
+        <NavBar />
 
         <SearchBox
           query={filterQuery}

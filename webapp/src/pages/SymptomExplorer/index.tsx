@@ -1,7 +1,7 @@
+import { useApp } from "../..";
 import AddSymptom from "../../components/AddSymptom";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
-import { HealthTracker } from "../../lib/app/app";
 import { Symptom, SymptomName } from "../../lib/domain/model";
 import Paths from "../../routes";
 import BlueprintThemeProvider from "../../style/theme";
@@ -9,11 +9,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-interface Props {
-  app: HealthTracker;
-}
+function SymptomExplorer() {
+  const app = useApp();
 
-function SymptomExplorer({ app }: Props) {
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
 
   useEffect(() => {
@@ -38,7 +36,7 @@ function SymptomExplorer({ app }: Props) {
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
-        <NavBar app={app} />
+        <NavBar />
         <div>SymptomExplorer</div>
         <AddSymptom add={handleAddSymptom} />
         {symptoms.map((symptom) => (

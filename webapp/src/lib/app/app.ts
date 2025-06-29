@@ -18,7 +18,7 @@ interface ConstructorArgs {
   remoteStorage: RemoteStorage;
 }
 
-export class HealthTracker {
+export class App {
   public settingsManager: SettingsManager;
   public storage: LocalStorage;
   public symptomManager: SymptomManager;
@@ -42,28 +42,28 @@ export class HealthTracker {
     this.remoteStorage = remoteStorage;
 
     this.settingsManager.change$.subscribe((change) => {
-      console.debug(`${HealthTracker.name}.settingsManager::change:`, change);
+      console.debug(`${App.name}.settingsManager::change:`, change);
       this.handleSettingsChange(change);
     });
 
     this.symptomManager.changes$.subscribe((change) => {
-      console.debug(`${HealthTracker.name}.symptomManager::change:`, change);
+      console.debug(`${App.name}.symptomManager::change:`, change);
       this.handleSymptomChanges(change);
     });
 
     this.metricManager.changes$.subscribe((change) => {
-      console.debug(`${HealthTracker.name}.metricManager::change:`, change);
+      console.debug(`${App.name}.metricManager::change:`, change);
       this.handleMetricChanges(change);
     });
 
     this.remoteStorage.change$.subscribe((change) => {
-      console.debug(`${HealthTracker.name}.remoteStorage::change:`, change);
+      console.debug(`${App.name}.remoteStorage::change:`, change);
       this.handleRemoteStorageChanges(change);
     });
   }
 
   public initialize(): void {
-    const _logPrefix = `${HealthTracker.name}.initialize`;
+    const _logPrefix = `${App.name}.initialize`;
     console.log(`${_logPrefix}::initialization started`);
 
     const settings = this.browserStorage.getSettings();

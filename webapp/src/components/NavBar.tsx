@@ -1,6 +1,6 @@
+import { useApp } from "..";
 import { assertNever } from "../exhaustive-match";
 import { SyncStatus } from "../lib/adapters/remoteStorage";
-import { HealthTracker } from "../lib/app/app";
 import Paths from "../routes";
 import { Button, Icon, IconName, IconSize } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
@@ -25,11 +25,9 @@ const Container = styled.div`
   margin-bottom: 1rem;
 `;
 
-interface Props {
-  app: HealthTracker;
-}
+function NavBar() {
+  const app = useApp();
 
-function NavBar({ app }: Props) {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(SyncStatus.onlineAndSynced);
 
   useEffect(() => {

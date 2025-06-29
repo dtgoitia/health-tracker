@@ -1,8 +1,8 @@
+import { useApp } from "../..";
 import CenteredPage from "../../components/CenteredPage";
 import { DeleteConfirmationDialog } from "../../components/DeleteConfirmationDialog";
 import NavBar from "../../components/NavBar";
 import { now } from "../../datetimeUtils";
-import { HealthTracker } from "../../lib/app/app";
 import { Symptom, SymptomId, SymptomName } from "../../lib/domain/model";
 import {
   setSymptomName,
@@ -23,11 +23,9 @@ const DRAFT_SYMPTOM: Symptom = {
   lastModified: now(),
 };
 
-interface Props {
-  app: HealthTracker;
-}
+function SymptomEditor() {
+  const app = useApp();
 
-function SymptomEditor({ app }: Props) {
   const { symptomId } = useParams();
   const navigate = useNavigate();
 
@@ -99,7 +97,7 @@ function SymptomEditor({ app }: Props) {
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
-        <NavBar app={app} />
+        <NavBar />
         <p>
           symptom ID:&nbsp;&nbsp;&nbsp;<code>{symptom.id}</code>
         </p>

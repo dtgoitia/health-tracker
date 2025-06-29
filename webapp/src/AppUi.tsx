@@ -1,4 +1,4 @@
-import { HealthTracker } from "./lib/app/app";
+import { useApp } from ".";
 import HistoryPage from "./pages/History";
 import PageNotFound from "./pages/PageNotFound";
 import { RecordMetricPage } from "./pages/RecordMetric";
@@ -9,22 +9,20 @@ import Paths from "./routes";
 import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 
-interface Props {
-  app: HealthTracker;
-}
+function AppUi() {
+  const app = useApp();
 
-function AppUi({ app }: Props) {
   useEffect(() => {
     app.initialize();
   }, [app]);
 
   return (
     <Routes>
-      <Route path={Paths.root} element={<RecordMetricPage app={app} />} />
-      <Route path={Paths.history} element={<HistoryPage app={app} />} />
-      <Route path={Paths.symptoms} element={<SymptomExplorer app={app} />} />
-      <Route path={Paths.symptomsEditor} element={<SymptomEditor app={app} />} />
-      <Route path={Paths.settings} element={<SettingsPage app={app} />} />
+      <Route path={Paths.root} element={<RecordMetricPage />} />
+      <Route path={Paths.history} element={<HistoryPage />} />
+      <Route path={Paths.symptoms} element={<SymptomExplorer />} />
+      <Route path={Paths.symptomsEditor} element={<SymptomEditor />} />
+      <Route path={Paths.settings} element={<SettingsPage />} />
       <Route path={Paths.notFound} element={<PageNotFound />} />
     </Routes>
   );

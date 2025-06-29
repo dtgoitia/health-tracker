@@ -1,8 +1,8 @@
+import { useApp } from "../..";
 import ReloadPage from "../../ReloadPage";
 import CenteredPage from "../../components/CenteredPage";
 import NavBar from "../../components/NavBar";
 import { nDaysAgo, now } from "../../datetimeUtils";
-import { HealthTracker } from "../../lib/app/app";
 import {
   FilterQuery,
   Intensity,
@@ -20,11 +20,9 @@ import SearchBox from "../History/SearchBox";
 import DailyReminder from "./DailyReminder";
 import { useEffect, useState } from "react";
 
-interface Props {
-  app: HealthTracker;
-}
+export function RecordMetricPage() {
+  const app = useApp();
 
-export function RecordMetricPage({ app }: Props) {
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [selected, setSelected] = useState<SymptomId | undefined>();
   const [metrics, setMetrics] = useState<Metric[]>([]);
@@ -85,7 +83,7 @@ export function RecordMetricPage({ app }: Props) {
   return (
     <BlueprintThemeProvider>
       <CenteredPage>
-        <NavBar app={app} />
+        <NavBar />
 
         <DailyReminder
           symptomManager={app.symptomManager}
