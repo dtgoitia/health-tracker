@@ -6,6 +6,7 @@ import {
   getLastNDates,
   now,
 } from "../../datetimeUtils";
+import { datesAreEqual } from "../datetimeUtils";
 import { unreachable } from "../devex";
 import { generateId } from "../hash";
 import { SortAction } from "../sort";
@@ -368,4 +369,14 @@ export function getIntensityLevelShorthand(intensity: Intensity): string {
  */
 function getMetricDate(metric: Metric): Milliseconds {
   return datetimeToMs(getDay(metric.date));
+}
+
+export function metricsAreEqual({ a, b }: { a: Metric; b: Metric }): boolean {
+  return (
+    a.id === b.id &&
+    a.symptomId === b.symptomId &&
+    a.intensity === b.intensity &&
+    a.notes === b.notes &&
+    datesAreEqual(a.date, b.date)
+  );
 }
