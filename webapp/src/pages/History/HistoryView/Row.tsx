@@ -1,5 +1,7 @@
 import { formatTime } from "../../../lib/datetimeUtils";
-import { Metric, Symptom } from "../../../lib/domain/model";
+import { Intensity, Metric, Symptom } from "../../../lib/domain/model";
+import Paths from "../../../routes";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const Col1 = styled.div`
@@ -15,7 +17,7 @@ const Col2 = styled.div`
 `;
 const Col3 = styled.div`
   order: 3;
-  flex-basis: 4rem;
+  flex-basis: 2rem;
   flex-shrink: 0;
 `;
 const Col5 = styled.div`
@@ -36,12 +38,22 @@ interface RowProps {
   metric: Metric;
 }
 function Row({ symptom, metric }: RowProps) {
+  const path = Paths.metric.replace(":metricId", metric.id);
   const time = formatTime(metric.date);
+
+  const intensityLabel = {
+    [Intensity.low]: "L",
+    [Intensity.medium]: "M",
+    [Intensity.high]: "H",
+  }[metric.intensity];
+
   return (
     <Container>
       <Col1>{time}</Col1>
-      <Col2>{symptom.name}</Col2>
-      <Col3>{metric.intensity}</Col3>
+      <Col2>
+        <Link to={path}>{symptom.name}</Link>
+      </Col2>
+      <Col3>{intensityLabel}</Col3>
       <Col5>{metric.notes}</Col5>
     </Container>
   );

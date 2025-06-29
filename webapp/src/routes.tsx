@@ -5,6 +5,7 @@
 enum Paths {
   root = "/",
   metrics = "/metrics",
+  metric = "/metrics/:metricId",
   symptoms = "/symptoms",
   symptomsEditor = "/symptoms/:symptomId",
   settings = "/settings",

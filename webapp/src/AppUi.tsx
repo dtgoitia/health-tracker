@@ -1,5 +1,6 @@
 import { useApp } from ".";
 import HistoryPage from "./pages/History";
+import { MetricPage } from "./pages/Metric";
 import PageNotFound from "./pages/PageNotFound";
 import { RecordMetricPage } from "./pages/RecordMetric";
 import SettingsPage from "./pages/Settings";
@@ -20,6 +21,7 @@ function AppUi() {
     <Routes>
       <Route path={Paths.root} element={<RecordMetricPage />} />
       <Route path={Paths.metrics} element={<HistoryPage />} />
+      <Route path={Paths.metric} element={<MetricPage />} />
       <Route path={Paths.symptoms} element={<SymptomExplorer />} />
       <Route path={Paths.symptomsEditor} element={<SymptomEditor />} />
       <Route path={Paths.settings} element={<SettingsPage />} />
